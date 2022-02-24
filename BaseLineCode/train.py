@@ -124,7 +124,7 @@ def train(data_dir, model_dir, args):
     val_loader = DataLoader(
         val_set,
         batch_size=args.valid_batch_size,
-        num_workers=multiprocessing.cpu_count()//2,
+        #num_workers=multiprocessing.cpu_count()//2,
         shuffle=False,
         pin_memory=use_cuda,
         drop_last=True,
@@ -255,6 +255,7 @@ def train(data_dir, model_dir, args):
             )
             logger.add_scalar("Val/loss", val_loss, epoch)
             logger.add_scalar("Val/accuracy", val_acc, epoch)
+            logger.add_scalar("Val/f1score(macro)", val_f1, epoch)
             logger.add_figure("results", figure, epoch)
             print()
 

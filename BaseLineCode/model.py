@@ -179,7 +179,7 @@ class ResNet18F(nn.Module):
     def __init__(self, num_classes):
         super().__init__()
         self.resnet18 = models.resnet18(pretrained=True)
-        self.resnet18.fc = nn.Linear(in_features=512, out_features = num_classes) 
+        self.resnet18.fc = nn.Linear(in_features=512, out_features = num_classes, bias= True) 
         # self.Linear_1 = nn.Linear(in_features=1000, out_features = num_classes)
 
         # initialize w & b
