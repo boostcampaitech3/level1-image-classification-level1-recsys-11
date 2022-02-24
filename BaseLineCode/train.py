@@ -10,6 +10,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.metrics import f1_score
 import torch
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DataLoader
@@ -123,7 +124,7 @@ def train(data_dir, model_dir, args):
     val_loader = DataLoader(
         val_set,
         batch_size=args.valid_batch_size,
-        num_workers=multiprocessing.cpu_count()//2,
+        #num_workers=multiprocessing.cpu_count()//2,
         shuffle=False,
         pin_memory=use_cuda,
         drop_last=True,
@@ -153,6 +154,7 @@ def train(data_dir, model_dir, args):
 
     best_val_acc = 0
     best_val_loss = np.inf
+    best_val_f1 = 0 # add <------------------------------------ add
     for epoch in range(args.epochs):
         # train loop
         model.train()
@@ -177,10 +179,11 @@ def train(data_dir, model_dir, args):
             if (idx + 1) % args.log_interval == 0:
                 train_loss = loss_value / args.log_interval
                 train_acc = matches / args.batch_size / args.log_interval
+                f1score = f1_score(labels.cpu().numpy(), preds.cpu().numpy(), average="macro") ######################### add f1score
                 current_lr = get_lr(optimizer)
                 print(
                     f"Epoch[{epoch}/{args.epochs}]({idx + 1}/{len(train_loader)}) || "
-                    f"training loss {train_loss:4.4} || training accuracy {train_acc:4.2%} || lr {current_lr}"
+                    f"training loss {train_loss:4.4} || training accuracy {train_acc:4.2%} || training f1 {f1score:4.4} || lr {current_lr}"
                 )
                 logger.add_scalar("Train/loss", train_loss, epoch * len(train_loader) + idx)
                 logger.add_scalar("Train/accuracy", train_acc, epoch * len(train_loader) + idx)
@@ -196,6 +199,8 @@ def train(data_dir, model_dir, args):
             model.eval()
             val_loss_items = []
             val_acc_items = []
+            val_f1_items = []
+
             figure = None
             for val_batch in val_loader:
                 inputs, labels = val_batch
@@ -207,8 +212,10 @@ def train(data_dir, model_dir, args):
 
                 loss_item = criterion(outs, labels).item()
                 acc_item = (labels == preds).sum().item()
+                f1_item = f1_score(labels.cpu().numpy(), preds.cpu().numpy(), average= 'macro')
                 val_loss_items.append(loss_item)
                 val_acc_items.append(acc_item)
+                val_f1_items.append(f1_item)
 
                 if figure is None:
                     inputs_np = torch.clone(inputs).detach().cpu().permute(0, 2, 3, 1).numpy()
@@ -217,20 +224,38 @@ def train(data_dir, model_dir, args):
                         inputs_np, labels, preds, n=16, shuffle=args.dataset != "MaskSplitByProfileDataset"
                     )
 
+
+            ### f1 score added
             val_loss = np.sum(val_loss_items) / len(val_loader)
             val_acc = np.sum(val_acc_items) / len(val_set)
+            # val_f1 = np.sum(val_f1_items) / len(val_loader)  # <-------------- confusing with divider which one is true ? between val_set or val_loader
+            val_f1 = np.mean(val_f1_items)
+
             best_val_loss = min(best_val_loss, val_loss)
-            if val_acc > best_val_acc:
-                print(f"New best model for val accuracy : {val_acc:4.2%}! saving the best model..")
+            
+            # best_val_f1  = max(best_val_f1, val_f1)
+            # 평가 기준이 f1 score이기 때문에 f1을 기준으로 best score를 계산하여 저장한다.
+            if val_f1 > best_val_f1:
+                print(f"New best model for val f1 score : {val_f1: 4.2}! saving the best model..")
                 torch.save(model.module.state_dict(), f"{save_dir}/best.pth")
-                best_val_acc = val_acc
+                best_val_f1 = val_f1
+
+            best_val_acc = max(best_val_acc, val_acc)
+            # 평가 기준이 acc 일 때, acc 기준으로 best score 계산
+            # if val_acc > best_val_acc:
+            #     print(f"New best model for val accuracy : {val_acc:4.2%}! saving the best model..")
+            #     torch.save(model.module.state_dict(), f"{save_dir}/best.pth")
+            #     best_val_acc = val_acc
+
+        
             torch.save(model.module.state_dict(), f"{save_dir}/last.pth")
             print(
-                f"[Val] acc : {val_acc:4.2%}, loss: {val_loss:4.2} || "
-                f"best acc : {best_val_acc:4.2%}, best loss: {best_val_loss:4.2}"
+                f"[Val] acc : {val_acc:4.2%}, loss: {val_loss:4.2}, f1 score ['macro'] : {val_f1:3.4}   || "
+                f"best acc : {best_val_acc:4.2%}, best loss: {best_val_loss:4.2}, best f1 score: {best_val_f1:3.4} ",   
             )
             logger.add_scalar("Val/loss", val_loss, epoch)
             logger.add_scalar("Val/accuracy", val_acc, epoch)
+            logger.add_scalar("Val/f1score(macro)", val_f1, epoch)
             logger.add_figure("results", figure, epoch)
             print()
 
@@ -247,7 +272,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', type=int, default=1, help='number of epochs to train (default: 1)')
     parser.add_argument('--dataset', type=str, default='MaskBaseDataset', help='dataset augmentation type (default: MaskBaseDataset)')
     parser.add_argument('--augmentation', type=str, default='BaseAugmentation', help='data augmentation type (default: BaseAugmentation)')
-    parser.add_argument("--resize", nargs="+", type=list, default=[128, 96], help='resize size for image when training')
+    parser.add_argument("--resize", nargs="+",type=int, default=[128, 96], help='resize size for image when training') # type=list
     parser.add_argument('--batch_size', type=int, default=64, help='input batch size for training (default: 64)')
     parser.add_argument('--valid_batch_size', type=int, default=1000, help='input batch size for validing (default: 1000)')
     parser.add_argument('--model', type=str, default='BaseModel', help='model type (default: BaseModel)')
