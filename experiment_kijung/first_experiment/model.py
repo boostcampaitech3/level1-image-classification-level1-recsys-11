@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from efficientnet_pytorch import EfficientNet
 
 
 class BaseModel(nn.Module):
@@ -33,7 +34,14 @@ class BaseModel(nn.Module):
         x = x.view(-1, 128)
         return self.fc(x)
 
+class EfficientNetB7(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        self.efficient_net_b7 = EfficientNet.from_pretrained('efficientnet-b7', num_classes)
 
+    def forward(self,x):
+        x = self.efficient_net_b7(x)
+        return x
 # Custom Model Template
 class MyModel(nn.Module):
     def __init__(self, num_classes):

@@ -242,6 +242,9 @@ def train(data_dir, model_dir, args):
             mlflow.log_metric("Val/loss", val_loss, epoch)
             mlflow.log_metric("Val/accuracy", val_acc, epoch)
 
+            mlflow.log_metric("best Val/loss", best_val_loss, epoch)
+            mlflow.log_metric("best Val/accuracy", best_val_acc, epoch)
+
             print()
 
 
