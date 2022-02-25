@@ -1,0 +1,15 @@
+artifact_uri: file:///opt/ml/level1-image-classification-level1-recsys-11/experiment_kijung/mlruns/1/87aa9c4092754c4da793ae481bb83d57/artifacts
+end_time: 1645766247326
+entry_point_name: ''
+experiment_id: '1'
+lifecycle_stage: active
+name: ''
+run_id: 87aa9c4092754c4da793ae481bb83d57
+run_uuid: 87aa9c4092754c4da793ae481bb83d57
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1645766090499
+status: 3
+tags: []
+user_id: root

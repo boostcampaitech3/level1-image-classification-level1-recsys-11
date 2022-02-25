@@ -1,0 +1,8 @@
+name: first_project
+
+entry_points:
+  main:
+    command: "python3 train.py \
+    --optimizer Adam \
+    --epochs 5 \
+    --criterion cross_entropy"

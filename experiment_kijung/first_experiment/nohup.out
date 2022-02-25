@@ -1,0 +1,47 @@
+TensorFlow installation not found - running with reduced feature set.
+TensorBoard 2.4.1 at http://0.0.0.0:6006/ (Press CTRL+C to quit)
+W0224 10:31:34.653404 140171661149952 plugin_event_multiplexer.py:263] Deleting accumulator 'exp'
+E0224 17:14:26.578831 140171650565888 _internal.py:225] 104.131.92.123 - - [24/Feb/2022 17:14:26] code 400, message Bad HTTP/0.9 request type ('l\x00')
+E0224 17:14:33.295361 140171650565888 _internal.py:225] 104.131.92.123 - - [24/Feb/2022 17:14:33] code 400, message Bad HTTP/0.9 request type ('\x12\x01\x00\x1a\x00\x00\x00\x00\x00\x00')
+E0224 17:14:39.781029 140171650565888 _internal.py:225] 104.131.92.123 - - [24/Feb/2022 17:14:39] code 400, message Bad request syntax ('\x00\x00\x00nþSMB@\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00$\x00\x04\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x02\x10\x02\x00\x03\x02\x03\x11\x03')
+[2022-02-25 03:30:52 +0000] [123695] [INFO] Starting gunicorn 20.1.0
+[2022-02-25 03:30:52 +0000] [123695] [ERROR] Connection in use: ('0.0.0.0', 30002)
+[2022-02-25 03:30:52 +0000] [123695] [ERROR] Retrying in 1 second.
+[2022-02-25 03:30:53 +0000] [123695] [ERROR] Connection in use: ('0.0.0.0', 30002)
+[2022-02-25 03:30:53 +0000] [123695] [ERROR] Retrying in 1 second.
+[2022-02-25 03:30:54 +0000] [123695] [ERROR] Connection in use: ('0.0.0.0', 30002)
+[2022-02-25 03:30:54 +0000] [123695] [ERROR] Retrying in 1 second.
+[2022-02-25 03:30:55 +0000] [123695] [ERROR] Connection in use: ('0.0.0.0', 30002)
+[2022-02-25 03:30:55 +0000] [123695] [ERROR] Retrying in 1 second.
+[2022-02-25 03:30:56 +0000] [123695] [ERROR] Connection in use: ('0.0.0.0', 30002)
+[2022-02-25 03:30:56 +0000] [123695] [ERROR] Retrying in 1 second.
+[2022-02-25 03:30:57 +0000] [123695] [ERROR] Can't connect to ('0.0.0.0', 30002)
+Running the mlflow server failed. Please see the logs above for details.
+[2022-02-25 03:32:05 +0000] [124039] [INFO] Starting gunicorn 20.1.0
+[2022-02-25 03:32:05 +0000] [124039] [ERROR] Connection in use: ('0.0.0.0', 30002)
+[2022-02-25 03:32:05 +0000] [124039] [ERROR] Retrying in 1 second.
+[2022-02-25 03:32:06 +0000] [124039] [ERROR] Connection in use: ('0.0.0.0', 30002)
+[2022-02-25 03:32:06 +0000] [124039] [ERROR] Retrying in 1 second.
+[2022-02-25 03:32:07 +0000] [124039] [ERROR] Connection in use: ('0.0.0.0', 30002)
+[2022-02-25 03:32:07 +0000] [124039] [ERROR] Retrying in 1 second.
+[2022-02-25 03:32:08 +0000] [124039] [ERROR] Connection in use: ('0.0.0.0', 30002)
+[2022-02-25 03:32:08 +0000] [124039] [ERROR] Retrying in 1 second.
+[2022-02-25 03:32:09 +0000] [124039] [ERROR] Connection in use: ('0.0.0.0', 30002)
+[2022-02-25 03:32:09 +0000] [124039] [ERROR] Retrying in 1 second.
+[2022-02-25 03:32:10 +0000] [124039] [ERROR] Can't connect to ('0.0.0.0', 30002)
+Running the mlflow server failed. Please see the logs above for details.
+[2022-02-25 03:35:56 +0000] [124880] [INFO] Starting gunicorn 20.1.0
+[2022-02-25 03:35:56 +0000] [124880] [INFO] Listening at: http://0.0.0.0:30002 (124880)
+[2022-02-25 03:35:56 +0000] [124880] [INFO] Using worker: sync
+[2022-02-25 03:35:56 +0000] [124895] [INFO] Booting worker with pid: 124895
+[2022-02-25 03:35:57 +0000] [124896] [INFO] Booting worker with pid: 124896
+[2022-02-25 03:35:57 +0000] [124897] [INFO] Booting worker with pid: 124897
+[2022-02-25 03:35:57 +0000] [124898] [INFO] Booting worker with pid: 124898
+[2022-02-25 03:41:53 +0000] [124880] [INFO] Handling signal: term
+[2022-02-25 03:41:53 +0000] [124896] [INFO] Worker exiting (pid: 124896)
+[2022-02-25 03:41:53 +0000] [124895] [INFO] Worker exiting (pid: 124895)
+[2022-02-25 03:41:53 +0000] [124897] [INFO] Worker exiting (pid: 124897)
+[2022-02-25 03:41:53 +0000] [124898] [INFO] Worker exiting (pid: 124898)
+[2022-02-25 03:41:53 +0000] [124880] [INFO] Shutting down: Master
+TensorFlow installation not found - running with reduced feature set.
+TensorBoard 2.4.1 at http://0.0.0.0:6006/ (Press CTRL+C to quit)
