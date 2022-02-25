@@ -1,3 +1,16 @@
+# Base Line Code Gyeongtae update version v.2.0.0
+
+
+### v.2.0.1 - dataset.py
+- 내용
+    - dataset.py > MaskBaseDataset update
+        > `image_paths`, `mask_labels`, `gender_labels`, `age_labels` 를 init 내부에 선언해줘서, path가 누적되는 현상을 해소해준다. 
+
+
+### v.2.0.0 
+update at 02.24 by Boostcamp ai tech
+
+---
 # pstage_01_image_classification
 
 ## Getting Started    
