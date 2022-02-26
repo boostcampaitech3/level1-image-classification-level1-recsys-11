@@ -34,21 +34,23 @@ class BaseModel(nn.Module):
         x = x.view(-1, 128)
         return self.fc(x)
 
+
 class ResNet18(nn.Module):
     def __init__(self, num_classes):
         super().__init__()
         self.resnet18 = models.resnet18(pretrained=True)
-        self.resnet18.fc = nn.Linear(in_features=512, out_features = num_classes, bias= True) 
+        self.resnet18.fc = nn.Linear(in_features=512, out_features=num_classes, bias=True)
         # self.Linear_1 = nn.Linear(in_features=1000, out_features = num_classes)
 
         # initialize w & b
         torch.nn.init.xavier_uniform_(self.resnet18.fc.weight)
-        stdv = 1/math.sqrt(self.resnet18.fc.in_features)
+        stdv = 1 / math.sqrt(self.resnet18.fc.in_features)
         self.resnet18.fc.bias.data.uniform_(-stdv, stdv)
 
     def forward(self, x):
         x = self.resnet18(x)
         return x
+
 
 class ResNet18Freeze(nn.Module):
     def __init__(self, num_classes):
@@ -59,38 +61,42 @@ class ResNet18Freeze(nn.Module):
             param.requires_grad = False
 
         in_features = self.resnet18.fc.in_features
-        self.resnet18.fc = nn.Linear(in_features=in_features, out_features = num_classes, bias= True) 
+        self.resnet18.fc = nn.Linear(in_features=in_features, out_features=num_classes, bias=True)
         # self.Linear_1 = nn.Linear(in_features=1000, out_features = num_classes)
 
         # initialize w & b
         torch.nn.init.xavier_uniform_(self.resnet18.fc.weight)
-        stdv = 1/math.sqrt(self.resnet18.fc.in_features)
+        stdv = 1 / math.sqrt(self.resnet18.fc.in_features)
         self.resnet18.fc.bias.data.uniform_(-stdv, stdv)
 
     def forward(self, x):
         x = self.resnet18(x)
         return x
 
+
 # EfficientNet
 from efficientnet_pytorch import EfficientNet
 import math
+
+
 class EfficientNetB3(nn.Module):
     def __init__(self, num_classes):
         super().__init__()
         self.efficientnet = EfficientNet.from_pretrained('efficientnet-b3')
-        
+
         in_features = self.efficientnet._fc.in_features
-        self.efficientnet._fc = nn.Linear(in_features=in_features, out_features = num_classes)  
+        self.efficientnet._fc = nn.Linear(in_features=in_features, out_features=num_classes)
         # self.linear = nn.Linear(in_features = self.efficientnet._fc.out_features, out_features = num_classes)
 
         # initialize w & b
         torch.nn.init.xavier_uniform_(self.efficientnet._fc.weight)
-        stdv = 1/math.sqrt(self.efficientnet._fc.in_features)
+        stdv = 1 / math.sqrt(self.efficientnet._fc.in_features)
         self.efficientnet._fc.bias.data.uniform_(-stdv, stdv)
 
     def forward(self, x):
         x = self.efficientnet(x)
         return x
+
 
 class EfficientNetB3Freeze(nn.Module):
     def __init__(self, num_classes):
@@ -102,12 +108,12 @@ class EfficientNetB3Freeze(nn.Module):
 
         # Drop out will be added Here
         in_features = self.efficientnet._fc.in_features
-        self.efficientnet._fc = nn.Linear(in_features=in_features, out_features = num_classes) 
+        self.efficientnet._fc = nn.Linear(in_features=in_features, out_features=num_classes)
         # self.linear = nn.Linear(in_features = self.efficientnet._fc.out_features, out_features = num_classes)
 
         # initialize w & b
         torch.nn.init.xavier_uniform_(self.efficientnet._fc.weight)
-        stdv = 1/math.sqrt(self.efficientnet._fc.in_features)
+        stdv = 1 / math.sqrt(self.efficientnet._fc.in_features)
         self.efficientnet._fc.bias.data.uniform_(-stdv, stdv)
 
     def forward(self, x):
@@ -116,43 +122,88 @@ class EfficientNetB3Freeze(nn.Module):
 
 
 from vit_pytorch import ViT
+
+
 class Vit(nn.Module):
     def __init__(self, num_classes):
         super().__init__()
 
         self.v = ViT(
-            image_size = 256, # Image size. If you have rectangular images, make sure your image size is the maximum of the width and height
-            patch_size = 32,
-            num_classes = num_classes, # Number of classes to classify.
-            dim = 1024,
-            depth = 6,
-            heads = 16,
-            mlp_dim = 2048,
-            dropout = 0.3, #0.1,
-            emb_dropout = 0.1
-            )   
+            image_size=256,
+            # Image size. If you have rectangular images, make sure your image size is the maximum of the width and height
+            patch_size=32,
+            num_classes=num_classes,  # Number of classes to classify.
+            dim=1024,
+            depth=6,
+            heads=16,
+            mlp_dim=2048,
+            dropout=0.3,  # 0.1,
+            emb_dropout=0.1
+        )
 
     def forward(self, x):
         x = self.v(x)
         return x
 
+
 # Pre trained ViT - B16 - weight freezed
 # https://github.com/lukemelas/PyTorch-Pretrained-ViT#loading-pretrained-models
 from pytorch_pretrained_vit import ViT
+
+
 class ViTPretrainedFreeze(nn.Module):
     def __init__(self, num_classes):
         super().__init__()
         self.model = ViT('B_16_imagenet1k', pretrained=True)
-        
+
         for param in self.model.parameters():
             param.requires_grad = False
 
         in_features = self.model.fc.in_features
-        self.model.fc = nn.Linear(in_features=in_features, out_features= num_classes, bias= True)
+        self.model.fc = nn.Linear(in_features=in_features, out_features=num_classes, bias=True)
 
         # initialize
         torch.nn.init.xavier_uniform_(self.model.fc.weight)
-        stdv = 1/math.sqrt(self.model.fc.in_features)
+        stdv = 1 / math.sqrt(self.model.fc.in_features)
+        self.model.fc.bias.data.uniform_(-stdv, stdv)
+
+    def forward(self, x):
+        return self.model(x)
+
+
+class Vgg13(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        self.model = torchvision.models.vgg13_bn(pretrained = True)
+
+        # for param in self.model.parameters():
+        #     param.requires_grad = False
+        in_features = self.model.fc.in_features
+        self.model.fc = nn.Linear(in_features=in_features, out_features=num_classes, bias=True)
+
+        # initialize
+        torch.nn.init.xavier_uniform_(self.model.fc.weight)
+        stdv = 1 / math.sqrt(self.model.fc.in_features)
+        self.model.fc.bias.data.uniform_(-stdv, stdv)
+
+    def forward(self, x):
+        return self.model(x)
+
+
+class Vgg13Freeze(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        self.model = torchvision.models.vgg13_bn(pretrained=True)
+
+        for param in self.model.parameters():
+            param.requires_grad = False
+
+        in_features = self.model.fc.in_features
+        self.model.fc = nn.Linear(in_features=in_features, out_features=num_classes, bias=True)
+
+        # initialize
+        torch.nn.init.xavier_uniform_(self.model.fc.weight)
+        stdv = 1 / math.sqrt(self.model.fc.in_features)
         self.model.fc.bias.data.uniform_(-stdv, stdv)
 
     def forward(self, x):

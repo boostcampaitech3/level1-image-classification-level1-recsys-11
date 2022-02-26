@@ -4,8 +4,9 @@
 - 🍿 RECSYS-11; RECFLIX
 
 ## ✏️ What We Did(가제)
-- [회의 노트 링크(가제)]()
+- [🔎 회의 노트 (외부 노션 링크)](https://recflix.notion.site/d4de596a7ca440829a08153fecc93aa4)
 - [각자 발표 자료 정리 한 것 링크(가제)]()
+- 
 
 
 
@@ -57,6 +58,9 @@
         - Albumentation 모듈을 활용하여 Augmentation 기법을 사용하기 위해서는 특별한 데이터셋이 필요하다.
         - 해당 데이터셋은 `MaskBaseDataset`의 Child-Class이다.
         - 요청시 `TestDataset`, `MaskSplitByProfileDataset` 기반도 만들어드림. 
+- **model.py**
+  - (Mode) `Vgg13Bn` 추가
+  - (Mode) `Vgg13BnFreeze` 추가
 ### v.2.0.2
 - **model.py**
     - import torch 추가
@@ -83,8 +87,10 @@
             LB : f1 0.5607, acc 62.5556
             ```
         - reference: https://github.com/lukemelas/PyTorch-Pretrained-ViT#loading-pretrained-models
+    - (Mode) `Vgg13Bn` 추가
+    - (Mode) `Vgg13BnFreeze` 추가
 
-    - 
+      - 
 - **train.py**
     - argparser로 resize하는 방법 변경(*inference.py*도 같이 변경)
         ```python
