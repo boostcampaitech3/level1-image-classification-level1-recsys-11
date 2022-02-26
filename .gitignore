@@ -2,3 +2,4 @@
 .venv
 model/
 __pycahche__
+BaseLineCodeV2/__pycache__/*

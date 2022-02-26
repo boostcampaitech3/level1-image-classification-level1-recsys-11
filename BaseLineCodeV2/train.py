@@ -20,6 +20,8 @@ from torch.utils.tensorboard import SummaryWriter
 from dataset import MaskBaseDataset
 from loss import create_criterion
 
+import mlflow
+import mlflow.pytorch
 
 def seed_everything(seed):
     torch.manual_seed(seed)
@@ -188,7 +190,9 @@ def train(data_dir, model_dir, args):
                 logger.add_scalar("Train/loss", train_loss, epoch * len(train_loader) + idx)
                 logger.add_scalar("Train/accuracy", train_acc, epoch * len(train_loader) + idx)
                 logger.add_scalar("Train/f1", train_f1, epoch * len(train_loader) + idx)
-
+                mlflow.log_metric("Train/loss", train_loss, epoch * len(train_loader) + idx)
+                mlflow.log_metric("Train/accuracy", train_acc, epoch * len(train_loader) + idx)
+                mlflow.log_metric("Train/f1", train_f1, epoch * len(train_loader) + idx)
 
                 loss_value = 0
                 matches = 0
@@ -236,6 +240,7 @@ def train(data_dir, model_dir, args):
             if val_acc > best_val_acc:
                 print(f"New best model for val accuracy : {val_acc:4.4%}! saving the best model..")
                 torch.save(model.module.state_dict(), f"{save_dir}/best.pth")
+                mlflow.pytorch.log_model(model, 'bestModel')
                 best_val_acc = val_acc
 
             torch.save(model.module.state_dict(), f"{save_dir}/last.pth")
@@ -247,11 +252,24 @@ def train(data_dir, model_dir, args):
             logger.add_scalar("Val/accuracy", val_acc, epoch)
             logger.add_scalar("Val/f1score(macro)", val_f1, epoch)
             logger.add_figure("results", figure, epoch)
+
+            mlflow.log_metric("Val/loss", val_loss, epoch)
+            mlflow.log_metric("Val/accuracy", val_acc, epoch)
+            mlflow.log_metric("Val/f1-macro", val_f1, epoch)
+
+            mlflow.log_metric("best Val/loss", best_val_loss, epoch)
+            mlflow.log_metric("best Val/accuracy", best_val_acc, epoch)
+            mlflow.log_metric("best Val/f1-macro", best_val_f1, epoch)
+
             print()
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+
+    remote_server_uri ='http://101.101.210.160:30001'
+    mlflow.set_tracking_uri(remote_server_uri)
+    experiment_name = "/my-experiment-log2remote"
 
     # Data and model checkpoints directories
     parser.add_argument('--seed', type=int, default=42, help='random seed (default: 42)')
@@ -274,10 +292,20 @@ if __name__ == '__main__':
     parser.add_argument('--data_dir', type=str, default=os.environ.get('SM_CHANNEL_TRAIN', '/opt/ml/input/data/train/images'))
     parser.add_argument('--model_dir', type=str, default=os.environ.get('SM_MODEL_DIR', './model'))
 
+
     args = parser.parse_args()
     print(args)
 
     data_dir = args.data_dir
     model_dir = args.model_dir
 
-    train(data_dir, model_dir, args)
+    mlflow.set_experiment(experiment_name)
+    experiment = mlflow.get_experiment_by_name(experiment_name)
+    client = mlflow.tracking.MlflowClient()
+
+
+    run = client.create_run(experiment.experiment_id)
+
+    with mlflow.start_run(run_id=run.info.run_id):
+        mlflow.log_params(args.__dict__)
+        train(data_dir, model_dir, args)
