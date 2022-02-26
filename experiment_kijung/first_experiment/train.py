@@ -255,9 +255,8 @@ if __name__ == '__main__':
     import os
     load_dotenv(verbose=True)
 
-    # remote_server_uri ='101.101.210.160:30002'
-    # mlflow.set_tracking_uri(remote_server_uri)
-    # mlflow.set_experiment("/my-experiment")
+    remote_server_uri ='http://101.101.210.160:30001'
+    mlflow.set_tracking_uri(remote_server_uri)
 
     # Data and model checkpoints directories
     parser.add_argument('--seed', type=int, default=42, help='random seed (default: 42)')
@@ -286,6 +285,13 @@ if __name__ == '__main__':
     data_dir = args.data_dir
     model_dir = args.model_dir
 
-    mlflow.log_params(args.__dict__)
+    experiment_name = "/my-experiment-log2remote"
 
-    train(data_dir, model_dir, args)
+    mlflow.set_experiment(experiment_name)
+    experiment = mlflow.get_experiment_by_name(experiment_name)
+    client = mlflow.tracking.MlflowClient()
+    run = client.create_run(experiment.experiment_id)
+
+    with mlflow.start_run(run_id=run.info.run_id):
+        mlflow.log_params(args.__dict__)
+        train(data_dir, model_dir, args)

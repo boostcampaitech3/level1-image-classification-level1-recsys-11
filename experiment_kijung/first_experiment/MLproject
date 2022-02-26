@@ -4,5 +4,8 @@ entry_points:
   main:
     command: "python3 train.py \
     --optimizer Adam \
-    --epochs 5 \
-    --criterion cross_entropy"
+    --epochs 3 \
+    --criterion cross_entropy \
+    --model EfficientNetB7 \
+    --batch_size 128 \
+    --name test_mlflow_server"

@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from efficientnet_pytorch import EfficientNet
-
+from pytorch_pretrained_vit import ViT
 
 class BaseModel(nn.Module):
     def __init__(self, num_classes):
@@ -42,6 +42,19 @@ class EfficientNetB7(nn.Module):
     def forward(self,x):
         x = self.efficient_net_b7(x)
         return x
+
+class ViTL32(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        self.vit_module = ViT('L_32', pretrained=True)
+        self.fc = nn.Linear(1000, num_classes)
+
+    def forward(self,x):
+        x = self.vit_module(x)
+        x = F.relu(x)
+        x = self.fc(x)
+        return x
+
 # Custom Model Template
 class MyModel(nn.Module):
     def __init__(self, num_classes):
