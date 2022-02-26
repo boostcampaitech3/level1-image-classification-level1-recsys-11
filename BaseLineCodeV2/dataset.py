@@ -8,7 +8,11 @@ import numpy as np
 import torch
 from PIL import Image
 from torch.utils.data import Dataset, Subset, random_split
-from torchvision.transforms import Resize, ToTensor, Normalize, Compose, CenterCrop, ColorJitter
+from torchvision.transforms import * #Resize, ToTensor, Normalize, Compose, CenterCrop, ColorJitter, Pad
+
+import cv2
+import albumentations as A
+
 
 IMG_EXTENSIONS = [
     ".jpg", ".JPG", ".jpeg", ".JPEG", ".png",
@@ -62,6 +66,89 @@ class CustomAugmentation:
 
     def __call__(self, image):
         return self.transform(image)
+
+
+class MyAugmentationCenter:
+    """
+    가운데만 크롭
+    """
+    def __init__(self, resize, mean, std, **args):
+        self.transform = Compose([
+            CenterCrop((256, 256)),
+            Resize(resize, Image.BILINEAR),
+            ToTensor(),
+            Normalize(mean=mean, std=std),
+        ])
+
+    def __call__(self, image):
+        return self.transform(image)
+
+class MyAugmentationBust:
+    """
+    흉상부분만 Crop
+    """
+    def __init__(self, resize, mean, std, **args):
+        self.transform = Compose([
+            Pad((114,0,114,114)),
+            CenterCrop((360, 360)),
+            Resize(resize, Image.BILINEAR),
+            ToTensor(),
+            Normalize(mean=mean, std=std),
+        ])
+
+    def __call__(self, image):
+        return self.transform(image)
+
+
+
+import albumentations as A
+import cv2
+from albumentations.pytorch import ToTensorV2
+
+class GoodAugmentation:
+    """
+    albumentations 모듈을 활용한 방법. 사람들이 많이 사용하는 Augmentation의 집합
+    """
+    def __init__(self, resize, mean, std, **args):
+
+        self.transform = A.Compose([
+            # Pad((114,0,114,114)),
+            A.CenterCrop(256, 256),
+            A.Resize(*resize), 
+            A.HorizontalFlip(p=.5),
+            A.augmentations.geometric.transforms.ShiftScaleRotate(rotate_limit= 10, p = 0.2),
+            A.augmentations.transforms.GaussNoise(var_limit=(10,20), mean=0, per_channel= True, p=0.4),
+            A.augmentations.geometric.transforms.ShiftScaleRotate(),
+            A.augmentations.transforms.CLAHE(),
+            A.augmentations.transforms.RandomBrightnessContrast(),
+            A.augmentations.transforms.RandomGamma(),
+            A.augmentations.transforms.HueSaturationValue(),
+            A.augmentations.transforms.RGBShift(),
+            A.Normalize(mean=mean, std=std),
+            ToTensorV2()
+        ])
+
+
+    def __call__(self, image):
+        return self.transform(image=image)['image']
+
+
+
+class CustomAlbumentationAug:
+    """
+    albumentations 모듈을 활용한 방법.
+    """
+    def __init__(self, resize, mean, std, **args):
+        self.transform = A.Compose([
+            A.Resize(*resize), 
+            ### Do YourSelf ###
+            A.Normalize(mean=mean, std=std),
+            ToTensorV2()
+        ])
+
+    def __call__(self, image):
+        return self.transform(image=image)['image']
+
 
 
 class MaskLabels(int, Enum):
@@ -118,16 +205,16 @@ class MaskBaseDataset(Dataset):
         "normal": MaskLabels.NORMAL
     }
 
-    image_paths = []
-    mask_labels = []
-    gender_labels = []
-    age_labels = []
-
     def __init__(self, data_dir, mean=(0.548, 0.504, 0.479), std=(0.237, 0.247, 0.246), val_ratio=0.2):
         self.data_dir = data_dir
         self.mean = mean
         self.std = std
         self.val_ratio = val_ratio
+
+        self.image_paths = []
+        self.mask_labels = []
+        self.gender_labels = []
+        self.age_labels = []
 
         self.transform = None
         self.setup()
@@ -291,6 +378,16 @@ class MaskSplitByProfileDataset(MaskBaseDataset):
 
     def split_dataset(self) -> List[Subset]:
         return [Subset(self, indices) for phase, indices in self.indices.items()]
+
+class MaskBaseDatasetForAlbum(MaskBaseDataset):
+    def __init__(self, data_dir, mean=(0.548, 0.504, 0.479), std=(0.237, 0.247, 0.246), val_ratio=0.2):
+        super().__init__(data_dir, mean, std, val_ratio)
+
+    def read_image(self, index):
+        image_path = self.image_paths[index]
+        image = cv2.imread(image_path)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        return image
 
 
 class TestDataset(Dataset):
