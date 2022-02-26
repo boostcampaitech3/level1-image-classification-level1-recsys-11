@@ -14,7 +14,7 @@
 
 
 
-# Base Line Code Gyeongtae update version v.2.0.2
+# Base Line Code Gyeongtae update version v.2.0.3
 
 ## 🔨 작업환경 구성하기
 - clone repository
