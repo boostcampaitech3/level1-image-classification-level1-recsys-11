@@ -1,4 +1,0 @@
-artifact_location: file:///opt/ml/level1-image-classification-level1-recsys-11/experiment_kijung/mlruns/1
-experiment_id: '1'
-lifecycle_stage: active
-name: kijung-experiment
