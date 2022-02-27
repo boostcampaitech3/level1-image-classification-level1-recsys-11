@@ -5,3 +5,5 @@ __pycahche__
 BaseLineCodeV2/__pycache__/*
 mlruns/*
 experiment_kijung/
+experiment_inhyeok/
+BaseLineCodeV2/nohup.out
