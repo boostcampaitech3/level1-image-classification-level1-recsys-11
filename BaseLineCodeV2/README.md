@@ -43,7 +43,62 @@
     - 해결방법 2   
     batch_size를 줄여나간다. 
 
-## 🔎 업데이트 노트 
+## 🔎 업데이트 노트
+
+### v.2.1.0
+MLflow로 원격로깅이 가능해졌습니다.
+
+MLflow 설치  
+```bash
+pip3 install mlflow
+```
+
+원격 로깅 주소  
+http://101.101.210.160:30001
+
+**mlflow 로깅 사용법**
+
+MLflow 로깅 방법은 노션 docs에 있으니 참고  
+https://www.notion.so/recflix/mlflow-f6390e20a43e474eb5c5ab01ec4c36cf
+
+**원격서버에 실험 추가하기**
+
+`experiment_name` 변수에 원하는 실험이름을 정하면 mlflow에 실험등록  
+이미 존재하면 해당 실험에 로그가 저장됨
+- **train.py**
+```python
+    if __name__ == '__main__':
+        parser = argparse.ArgumentParser()
+
+        remote_server_uri ='http://101.101.210.160:30001'
+        mlflow.set_tracking_uri(remote_server_uri)
+        experiment_name = "/my-experiment-log2remote"
+```
+
+베이스라인코드에서 MLflow를 실행하기 위한 MLproject 파일 추가
+
+- **MLproject**
+
+`entry_points`의 `main`에 실행 argument 입력 후 저장
+```
+name: first_project
+
+entry_points:
+  main:
+    command: "python3 train.py \
+    --optimizer Adam \
+    --epochs 3 \
+    --criterion cross_entropy \
+    --model BaseModel \
+    --batch_size 128 \
+    --name test_mlflow_server"
+```
+
+**MLflow를 이용한 실험 시작**  
+MLproject에 있는 디렉토리에서 다음의 명령어로 학습 및 로깅 수행
+```bash
+mlflow run -e main . --no-conda
+```
 
 ### v.2.0.3
 이제 Albumentation을 활용해서 Augmentation을 사용할 수 있습니다!🎉🎉🎉  
@@ -57,6 +112,7 @@
         - Albumentation 모듈을 활용하여 Augmentation 기법을 사용하기 위해서는 특별한 데이터셋이 필요하다.
         - 해당 데이터셋은 `MaskBaseDataset`의 Child-Class이다.
         - 요청시 `TestDataset`, `MaskSplitByProfileDataset` 기반도 만들어드림. 
+
 ### v.2.0.2
 - **model.py**
     - import torch 추가
