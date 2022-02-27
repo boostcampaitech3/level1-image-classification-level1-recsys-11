@@ -326,6 +326,22 @@ class Inception(nn.Module):
     def forward(self, x):
         return self.model(x)
 
+class ResNet18Dropout(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        self.resnet18 = models.resnet18(pretrained=True)
+        self.resnet18.fc = nn.Linear(in_features=512, out_features=num_classes, bias=True)
+        # self.Linear_1 = nn.Linear(in_features=1000, out_features = num_classes)
+
+        # initialize w & b
+        torch.nn.init.xavier_uniform_(self.resnet18.fc.weight)
+        stdv = 1 / math.sqrt(self.resnet18.fc.in_features)
+        self.resnet18.fc.bias.data.uniform_(-stdv, stdv)
+
+    def forward(self, x):
+        x = self.resnet18(x)
+        return x
+
 
 # Custom Model Template
 class MyModel(nn.Module):

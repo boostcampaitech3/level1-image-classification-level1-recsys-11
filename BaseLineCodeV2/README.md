@@ -47,14 +47,17 @@
 ## 🔎 업데이트 노트
 ### v.2.1.1
 - **model.py**
-  - (Model) `Vgg11` 추가
-  - (Model) `Vgg11Freeze` 추가 
-  - (Model) `Vgg13` 이름변경 (원래 Vgg13bn)
-  - (Model) `Vgg13Freeze` 이름변경 (원래 Vgg13bnFreeze)
-  - (Model) `Vgg16` 추가
-  - (Model) `Vgg16Freeze` 추가 
-  - (Model) `Inception` 추가
-    - input size is MUST **299x299**
+    - (Model) `Vgg11` 추가
+    - (Model) `Vgg11Freeze` 추가 
+    - (Model) `Vgg13` 이름변경 (원래 Vgg13bn)
+    - (Model) `Vgg13Freeze` 이름변경 (원래 Vgg13bnFreeze)
+    - (Model) `Vgg16` 추가
+    - (Model) `Vgg16Freeze` 추가 
+    - (Model) `Inception` 추가
+        - input size is MUST **299x299**
+    - (Model) `ResNet18Dropout` 추가
+        - 기존의 `ResNet18` 모델에서 마지막 FC-layer에 값이 전달되기 전에 Dropout을 달아봤습니다. 
+        - `__init__`에서 (fc) layer에 register_forward_hook을 이용하여, 모델을 직접 print해도 구조에 포함되지는 않습니다. 
 
 - **dataset.py**
     - `AugForInception`
