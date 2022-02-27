@@ -1,0 +1,17 @@
+[2022-02-26 17:44:58 +0000] [36920] [INFO] Starting gunicorn 20.1.0
+[2022-02-26 17:44:58 +0000] [36920] [INFO] Listening at: http://0.0.0.0:30001 (36920)
+[2022-02-26 17:44:58 +0000] [36920] [INFO] Using worker: sync
+[2022-02-26 17:44:58 +0000] [36935] [INFO] Booting worker with pid: 36935
+[2022-02-26 17:44:58 +0000] [36936] [INFO] Booting worker with pid: 36936
+[2022-02-26 17:44:58 +0000] [36937] [INFO] Booting worker with pid: 36937
+[2022-02-26 17:44:58 +0000] [36938] [INFO] Booting worker with pid: 36938
+[2022-02-26 18:01:35 +0000] [36920] [INFO] Handling signal: hup
+[2022-02-26 18:01:35 +0000] [36920] [INFO] Hang up: Master
+[2022-02-26 18:01:35 +0000] [37045] [INFO] Booting worker with pid: 37045
+[2022-02-26 18:01:35 +0000] [37046] [INFO] Booting worker with pid: 37046
+[2022-02-26 18:01:35 +0000] [36920] [WARNING] Worker with pid 36938 was terminated due to signal 1
+[2022-02-26 18:01:35 +0000] [36920] [WARNING] Worker with pid 36935 was terminated due to signal 1
+[2022-02-26 18:01:35 +0000] [37047] [INFO] Booting worker with pid: 37047
+[2022-02-26 18:01:35 +0000] [37048] [INFO] Booting worker with pid: 37048
+[2022-02-26 18:01:35 +0000] [36920] [WARNING] Worker with pid 36937 was terminated due to signal 1
+[2022-02-26 18:01:35 +0000] [36920] [WARNING] Worker with pid 36936 was terminated due to signal 1
