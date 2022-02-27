@@ -126,7 +126,7 @@ def train(data_dir, model_dir, args):
     val_loader = DataLoader(
         val_set,
         batch_size=args.valid_batch_size,
-        # num_workers=multiprocessing.cpu_count() // 2,
+        num_workers=multiprocessing.cpu_count() // 2,
         shuffle=False,
         pin_memory=use_cuda,
         drop_last=True,
@@ -170,6 +170,8 @@ def train(data_dir, model_dir, args):
             optimizer.zero_grad()
 
             outs = model(inputs)
+            if args.model in 'Inception': # for inception v3
+                outs = outs.logits
             preds = torch.argmax(outs, dim=-1)
             loss = criterion(outs, labels)
 
