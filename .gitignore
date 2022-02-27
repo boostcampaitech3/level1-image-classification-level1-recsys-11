@@ -5,3 +5,4 @@ __pycahche__
 BaseLineCodeV2/__pycache__/*
 mlruns/*
 experiment_kijung/
+output/
