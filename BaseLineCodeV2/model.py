@@ -4,6 +4,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+def set_parameter_requires_grad(model, feature_extracting):
+    if feature_extracting:
+        for param in model.parameters():
+            param.requires_grad = False
+
+
 class BaseModel(nn.Module):
     def __init__(self, num_classes):
         super().__init__()
@@ -171,20 +177,60 @@ class ViTPretrainedFreeze(nn.Module):
         return self.model(x)
 
 
-class Vgg13(nn.Module):
+# VGG line has a problem with 13, 19 version
+class Vgg11(nn.Module):
     def __init__(self, num_classes):
         super().__init__()
-        self.model = torchvision.models.vgg13_bn(pretrained = True)
+        self.model = models.vgg11_bn(pretrained=True)
 
         # for param in self.model.parameters():
         #     param.requires_grad = False
-        in_features = self.model.fc.in_features
-        self.model.fc = nn.Linear(in_features=in_features, out_features=num_classes, bias=True)
+        in_features = self.model.classifier[6].in_features
+        self.model.classifier[6] = nn.Linear(in_features=in_features, out_features=num_classes, bias=True)
 
         # initialize
-        torch.nn.init.xavier_uniform_(self.model.fc.weight)
-        stdv = 1 / math.sqrt(self.model.fc.in_features)
-        self.model.fc.bias.data.uniform_(-stdv, stdv)
+        torch.nn.init.xavier_uniform_(self.model.classifier[6].weight)
+        stdv = 1 / math.sqrt(self.model.classifier[6].in_features)
+        self.model.classifier[6].bias.data.uniform_(-stdv, stdv)
+
+    def forward(self, x):
+        return self.model(x)
+
+
+class Vgg11Freeze(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        self.model = models.vgg11_bn(pretrained=True)
+
+        for param in self.model.parameters():
+            param.requires_grad = False
+
+        in_features = self.model.classifier[6].in_features
+        self.model.classifier[6] = nn.Linear(in_features=in_features, out_features=num_classes, bias=True)
+
+        # initialize
+        torch.nn.init.xavier_uniform_(self.model.classifier[6].weight)
+        stdv = 1 / math.sqrt(self.model.classifier[6].in_features)
+        self.model.classifier[6].bias.data.uniform_(-stdv, stdv)
+
+    def forward(self, x):
+        return self.model(x)
+
+
+class Vgg13(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        self.model = models.vgg13_bn(pretrained=True)
+
+        # for param in self.model.parameters():
+        #     param.requires_grad = False
+        in_features = self.model.classifier[6].in_features
+        self.model.classifier[6] = nn.Linear(in_features=in_features, out_features=num_classes, bias=True)
+
+        # initialize
+        torch.nn.init.xavier_uniform_(self.model.classifier[6].weight)
+        stdv = 1 / math.sqrt(self.model.classifier[6].in_features)
+        self.model.classifier[6].bias.data.uniform_(-stdv, stdv)
 
     def forward(self, x):
         return self.model(x)
@@ -193,15 +239,86 @@ class Vgg13(nn.Module):
 class Vgg13Freeze(nn.Module):
     def __init__(self, num_classes):
         super().__init__()
-        self.model = torchvision.models.vgg13_bn(pretrained=True)
+        self.model = models.vgg13_bn(pretrained=True)
 
         for param in self.model.parameters():
             param.requires_grad = False
 
-        in_features = self.model.fc.in_features
-        self.model.fc = nn.Linear(in_features=in_features, out_features=num_classes, bias=True)
+        in_features = self.model.classifier[6].in_features
+        self.model.classifier[6] = nn.Linear(in_features=in_features, out_features=num_classes, bias=True)
 
         # initialize
+        torch.nn.init.xavier_uniform_(self.model.classifier[6].weight)
+        stdv = 1 / math.sqrt(self.model.classifier[6].in_features)
+        self.model.classifier[6].bias.data.uniform_(-stdv, stdv)
+
+    def forward(self, x):
+        return self.model(x)
+
+
+class Vgg16(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        self.model = models.vgg16_bn(pretrained=True)
+
+        # for param in self.model.parameters():
+        #     param.requires_grad = False
+        in_features = self.model.classifier[6].in_features
+        self.model.classifier[6] = nn.Linear(in_features=in_features, out_features=num_classes, bias=True)
+
+        # initialize
+        torch.nn.init.xavier_uniform_(self.model.classifier[6].weight)
+        stdv = 1 / math.sqrt(self.model.classifier[6].in_features)
+        self.model.classifier[6].bias.data.uniform_(-stdv, stdv)
+
+    def forward(self, x):
+        return self.model(x)
+
+
+class Vgg16Freeze(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        self.model = models.vgg16_bn(pretrained=True)
+
+        for param in self.model.parameters():
+            param.requires_grad = False
+
+        in_features = self.model.classifier[6].in_features
+        self.model.classifier[6] = nn.Linear(in_features=in_features, out_features=num_classes, bias=True)
+
+        # initialize
+        torch.nn.init.xavier_uniform_(self.model.classifier[6].weight)
+        stdv = 1 / math.sqrt(self.model.classifier[6].in_features)
+        self.model.classifier[6].bias.data.uniform_(-stdv, stdv)
+
+    def forward(self, x):
+        return self.model(x)
+
+
+# ERROR
+# TODO fix the model, input size should be 3x299x299
+# https://pytorch.org/tutorials/beginner/finetuning_torchvision_models_tutorial.html#inception-v3
+class Inception(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        self.model = models.inception_v3(pretrained=True)
+        set_parameter_requires_grad(self.model, feature_extracting = False) # if True -> FREEZE # TODO 이 부분을 모듈화 해서 싹 다 추가시켜주자
+        # for param in self.model.parameters():
+        #     param.requires_grad = False
+
+        # Handle the auxilary net
+        num_ftrs = self.model.AuxLogits.fc.in_features
+        self.model.AuxLogits.fc = nn.Linear(num_ftrs, num_classes)
+        # Handle the primary net
+        num_ftrs = self.model.fc.in_features
+        self.model.fc = nn.Linear(num_ftrs, num_classes)
+        # input_size = 299
+
+        # initialize w & b
+        torch.nn.init.xavier_uniform_(self.model.AuxLogits.fc.weight)
+        stdv = 1 / math.sqrt(self.model.AuxLogits.fc.in_features)
+        self.model.AuxLogits.fc.bias.data.uniform_(-stdv, stdv)
+
         torch.nn.init.xavier_uniform_(self.model.fc.weight)
         stdv = 1 / math.sqrt(self.model.fc.in_features)
         self.model.fc.bias.data.uniform_(-stdv, stdv)

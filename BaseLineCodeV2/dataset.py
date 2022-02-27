@@ -8,11 +8,10 @@ import numpy as np
 import torch
 from PIL import Image
 from torch.utils.data import Dataset, Subset, random_split
-from torchvision.transforms import * #Resize, ToTensor, Normalize, Compose, CenterCrop, ColorJitter, Pad
+from torchvision.transforms import *  # Resize, ToTensor, Normalize, Compose, CenterCrop, ColorJitter, Pad
 
 import cv2
 import albumentations as A
-
 
 IMG_EXTENSIONS = [
     ".jpg", ".JPG", ".jpeg", ".JPEG", ".png",
@@ -72,6 +71,7 @@ class MyAugmentationCenter:
     """
     가운데만 크롭
     """
+
     def __init__(self, resize, mean, std, **args):
         self.transform = Compose([
             CenterCrop((256, 256)),
@@ -83,13 +83,15 @@ class MyAugmentationCenter:
     def __call__(self, image):
         return self.transform(image)
 
+
 class MyAugmentationBust:
     """
     흉상부분만 Crop
     """
+
     def __init__(self, resize, mean, std, **args):
         self.transform = Compose([
-            Pad((114,0,114,114)),
+            Pad((114, 0, 114, 114)),
             CenterCrop((360, 360)),
             Resize(resize, Image.BILINEAR),
             ToTensor(),
@@ -100,25 +102,24 @@ class MyAugmentationBust:
         return self.transform(image)
 
 
-
 import albumentations as A
 import cv2
 from albumentations.pytorch import ToTensorV2
+
 
 class GoodAugmentation:
     """
     albumentations 모듈을 활용한 방법. 사람들이 많이 사용하는 Augmentation의 집합
     """
-    def __init__(self, resize, mean, std, **args):
 
+    def __init__(self, resize, mean, std, **args):
         self.transform = A.Compose([
             # Pad((114,0,114,114)),
             A.CenterCrop(256, 256),
-            A.Resize(*resize), 
+            A.Resize(*resize),
             A.HorizontalFlip(p=.5),
-            A.augmentations.geometric.transforms.ShiftScaleRotate(rotate_limit= 10, p = 0.2),
-            A.augmentations.transforms.GaussNoise(var_limit=(10,20), mean=0, per_channel= True, p=0.4),
-            A.augmentations.geometric.transforms.ShiftScaleRotate(),
+            A.augmentations.geometric.transforms.ShiftScaleRotate(rotate_limit=10, p=0.2),
+            A.augmentations.transforms.GaussNoise(var_limit=(10, 20), mean=0, per_channel=True, p=0.4),
             A.augmentations.transforms.CLAHE(),
             A.augmentations.transforms.RandomBrightnessContrast(),
             A.augmentations.transforms.RandomGamma(),
@@ -128,20 +129,23 @@ class GoodAugmentation:
             ToTensorV2()
         ])
 
-
     def __call__(self, image):
         return self.transform(image=image)['image']
 
 
-
-class CustomAlbumentationAug:
-    """
-    albumentations 모듈을 활용한 방법.
-    """
+class AugForInception:
     def __init__(self, resize, mean, std, **args):
         self.transform = A.Compose([
-            A.Resize(*resize), 
-            ### Do YourSelf ###
+            A.CenterCrop(299, 299),
+            A.Resize(*resize),
+            A.HorizontalFlip(p=.5),
+            A.augmentations.geometric.transforms.ShiftScaleRotate(rotate_limit=5, p=0.2),
+            A.augmentations.transforms.GaussNoise(var_limit=(1, 10), mean=0, per_channel=True, p=0.3),
+            A.augmentations.transforms.CLAHE(),
+            A.augmentations.transforms.RandomBrightnessContrast(p=1),
+            A.augmentations.transforms.RandomGamma(p=1),
+            A.augmentations.transforms.HueSaturationValue(p=1),
+            # A.augmentations.transforms.RGBShift(),
             A.Normalize(mean=mean, std=std),
             ToTensorV2()
         ])
@@ -149,6 +153,22 @@ class CustomAlbumentationAug:
     def __call__(self, image):
         return self.transform(image=image)['image']
 
+
+class CustomAlbumentationAug:
+    """
+    albumentations 모듈을 활용한 방법.
+    """
+
+    def __init__(self, resize, mean, std, **args):
+        self.transform = A.Compose([
+            A.Resize(*resize),
+            ### Do YourSelf ###
+            A.Normalize(mean=mean, std=std),
+            ToTensorV2()
+        ])
+
+    def __call__(self, image):
+        return self.transform(image=image)['image']
 
 
 class MaskLabels(int, Enum):
@@ -232,7 +252,8 @@ class MaskBaseDataset(Dataset):
                 if _file_name not in self._file_names:  # "." 로 시작하는 파일 및 invalid 한 파일들은 무시합니다
                     continue
 
-                img_path = os.path.join(self.data_dir, profile, file_name)  # (resized_data, 000004_male_Asian_54, mask1.jpg)
+                img_path = os.path.join(self.data_dir, profile,
+                                        file_name)  # (resized_data, 000004_male_Asian_54, mask1.jpg)
                 mask_label = self._file_names[_file_name]
 
                 id, gender, race, age = profile.split("_")
@@ -361,7 +382,8 @@ class MaskSplitByProfileDataset(MaskBaseDataset):
                     if _file_name not in self._file_names:  # "." 로 시작하는 파일 및 invalid 한 파일들은 무시합니다
                         continue
 
-                    img_path = os.path.join(self.data_dir, profile, file_name)  # (resized_data, 000004_male_Asian_54, mask1.jpg)
+                    img_path = os.path.join(self.data_dir, profile,
+                                            file_name)  # (resized_data, 000004_male_Asian_54, mask1.jpg)
                     mask_label = self._file_names[_file_name]
 
                     id, gender, race, age = profile.split("_")
@@ -379,8 +401,21 @@ class MaskSplitByProfileDataset(MaskBaseDataset):
     def split_dataset(self) -> List[Subset]:
         return [Subset(self, indices) for phase, indices in self.indices.items()]
 
+
 class MaskBaseDatasetForAlbum(MaskBaseDataset):
     def __init__(self, data_dir, mean=(0.548, 0.504, 0.479), std=(0.237, 0.247, 0.246), val_ratio=0.2):
+        super().__init__(data_dir, mean, std, val_ratio)
+
+    def read_image(self, index):
+        image_path = self.image_paths[index]
+        image = cv2.imread(image_path)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        return image
+
+
+class MaskSplitByProfileDatasetForAlbum(MaskBaseDataset):
+    def __init__(self, data_dir, mean=(0.548, 0.504, 0.479), std=(0.237, 0.247, 0.246), val_ratio=0.2):
+        self.indices = defaultdict(list)
         super().__init__(data_dir, mean, std, val_ratio)
 
     def read_image(self, index):
@@ -408,3 +443,34 @@ class TestDataset(Dataset):
 
     def __len__(self):
         return len(self.img_paths)
+
+
+class TestDatasetForAlbum(Dataset):
+    def __init__(self, img_paths, resize, mean=(0.548, 0.504, 0.479), std=(0.237, 0.247, 0.246)):
+        self.img_paths = img_paths
+        self.transform = A.Compose([
+            A.CenterCrop(299, 299),
+            A.Resize(*resize),
+            A.HorizontalFlip(p=.5),
+            # A.augmentations.transforms.GaussNoise(var_limit=(1, 10), mean=0, per_channel=True, p=0.3),
+            # A.augmentations.transforms.CLAHE(),
+            A.augmentations.transforms.RandomBrightnessContrast(p=1),
+            A.augmentations.transforms.RandomGamma(p=1),
+            A.augmentations.transforms.HueSaturationValue(p=1),
+            # A.augmentations.transforms.RGBShift(),
+            A.Normalize(mean=mean, std=std),
+            ToTensorV2()
+        ])
+
+    def __getitem__(self, index):
+        image = cv2.imread(self.img_paths[index])
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+        if self.transform:
+            image = self.transform(image=image)['image']
+        return image
+
+    def __len__(self):
+        return len(self.img_paths)
+
+
