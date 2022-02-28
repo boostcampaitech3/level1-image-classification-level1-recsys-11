@@ -6,7 +6,7 @@ def change_folder_name(df, idx):
     id_ = df['error_id'][idx]    
 
     before_fold = [os.path.join(folder_dir, folder) for folder in folder_name if id_ in folder][0]
-    os.rename(before_fold, before_fold.replace(df['before'][idx], df['after'][idx]))
+    shutil.move(before_fold, before_fold.replace(df['before'][idx], df['after'][idx]))
 
 def change_file_name(df, idx):
     id_ = df['error_id'][idx]
@@ -31,10 +31,9 @@ copy_tree = input()
 print('데이터 바꾸기를 작업하실 경로를 지정해주세요. ex) /opt/ml/input/data')
 folder_dir = input()+'/train/images'
 
-print('바꿔야하는 데이터가 담긴 파일의 경로와 이름을 지정해주세요. ex) /opt/ml/change_table.csv')
+print('바꿔야하는 데이터가 담긴 파일의 경로와 이름을 지정해주세요. ex) /opt/ml/level1-image-classification-level1-recsys-11/Data_Processing/change_table.csv')
 need_change_file = input() 
 ####################################
-
 
 shutil.copytree(data_tree, copy_tree)  # data_tree의 데이터를 copy_tree로 복사
 
@@ -55,7 +54,7 @@ for idx in range(len(df)):
     try:
         line = df.iloc[idx]
         if line['type'] == 'file':
-            change_file_name(df, idx)
+            # change_file_name(df, idx)
             print("change file_name - {} [{} <-> {}]!".format(df['error_id'][idx], df['before'][idx], df['after'][idx]))
         elif line['type'] == 'all':
             change_folder_name(df, idx)
@@ -63,4 +62,4 @@ for idx in range(len(df)):
     except:
         print("fail - ", idx)
         
-print("="*30)
+print("="*30) 
