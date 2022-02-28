@@ -325,6 +325,23 @@ class Inception(nn.Module):
 
     def forward(self, x):
         return self.model(x)
+        
+class ResNet18Dropout(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        self.resnet18 = models.resnet18(pretrained=True)
+        self.resnet18.fc = nn.Linear(in_features=512, out_features=num_classes, bias=True)
+        # https://discuss.pytorch.org/t/inject-dropout-into-resnet-or-any-other-network/66322/3
+        self.resnet18.fc.register_forward_hook(lambda m, inp, out: F.dropout(out, p=0.25, training=m.training))        
+
+        # initialize w & b
+        torch.nn.init.xavier_uniform_(self.resnet18.fc.weight)
+        stdv = 1 / math.sqrt(self.resnet18.fc.in_features)
+        self.resnet18.fc.bias.data.uniform_(-stdv, stdv)
+
+    def forward(self, x):
+        x = self.resnet18(x)
+        return x
 
 
 # Custom Model Template

@@ -8,3 +8,8 @@ experiment_kijung/
 BaseLineCodeV2/test.py
 experiment_inhyeok/
 BaseLineCodeV2/nohup.out
+output/
+experiment_inhyeok/
+BaseLineCodeV2/nohup.out
+two_optimizer.ipynb
+_NOT_FOR_USE.ipynb
