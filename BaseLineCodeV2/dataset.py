@@ -424,6 +424,54 @@ class MaskSplitByProfileDatasetForAlbum(MaskBaseDataset):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         return image
 
+class MaskSplitByProfileDatasetForAlbumOnlyMask(MaskSplitByProfileDatasetForAlbum):
+    def __init__(self, data_dir, mean=(0.548, 0.504, 0.479), std=(0.237, 0.247, 0.246), val_ratio=0.2):
+        super().__init__(data_dir, mean, std, val_ratio)
+        self.num_classes = 3
+    
+    def __getitem__(self, index):
+        data = super().__getitem__(index)[0]
+        label = super().__getitem__(index)[1]
+
+        if label >= 0 and label < 6:
+            return data, 0
+        if label >= 6 and label < 12:
+            return data, 1
+        
+        return data, 2
+
+class MaskSplitByProfileDatasetForAlbumOnlyGenderAge(MaskSplitByProfileDatasetForAlbum):
+    def __init__(self, data_dir, mean=(0.548, 0.504, 0.479), std=(0.237, 0.247, 0.246), val_ratio=0.2):
+        super().__init__(data_dir, mean, std, val_ratio)
+        self.num_classes = 6
+    
+    def __getitem__(self, index):
+        data = super().__getitem__(index)[0]
+        label = super().__getitem__(index)[1]
+
+        label_dict = {
+            0 : 0,
+            6 : 0,
+            12 : 0,
+            1 : 1,
+            7 : 1,
+            13 : 1,
+            2 : 2,
+            8 : 2,
+            14 : 2,
+            3 : 3,
+            9 : 3,
+            15 : 3,
+            4 : 4,
+            10 : 4,
+            16 : 4,
+            5 : 5,
+            11 : 5,
+            17 : 5,
+        }
+        
+        return data, label_dict[label]
+
 
 class TestDataset(Dataset):
     def __init__(self, img_paths, resize, mean=(0.548, 0.504, 0.479), std=(0.237, 0.247, 0.246)):

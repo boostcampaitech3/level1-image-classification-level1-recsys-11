@@ -289,6 +289,8 @@ if __name__ == '__main__':
     parser.add_argument('--lr_decay_step', type=int, default=20, help='learning rate scheduler deacy step (default: 20)')
     parser.add_argument('--log_interval', type=int, default=20, help='how many batches to wait before logging training status')
     parser.add_argument('--name', default='exp', help='model save at {SM_MODEL_DIR}/{name}')
+    parser.add_argument('--user', default='unknown', help='set experiment username')
+
 
     # Container environment
     parser.add_argument('--data_dir', type=str, default=os.environ.get('SM_CHANNEL_TRAIN', '/opt/ml/input/data/train/images'))
@@ -305,9 +307,10 @@ if __name__ == '__main__':
     experiment = mlflow.get_experiment_by_name(experiment_name)
     client = mlflow.tracking.MlflowClient()
 
-
     run = client.create_run(experiment.experiment_id)
 
     with mlflow.start_run(run_id=run.info.run_id):
+        # mlflow.set_tag('mlflow.runName', run_name)
+        mlflow.set_tag('mlflow.user', args.user)
         mlflow.log_params(args.__dict__)
         train(data_dir, model_dir, args)

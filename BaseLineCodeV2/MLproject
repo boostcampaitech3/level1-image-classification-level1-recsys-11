@@ -6,6 +6,9 @@ entry_points:
     --optimizer Adam \
     --epochs 3 \
     --criterion cross_entropy \
+    --augmentation CustomAlbumentationAug \
+    --dataset MaskSplitByProfileDatasetForAlbumOnlyMask \
     --model BaseModel \
     --batch_size 128 \
-    --name test_mlflow_server"
+    --name test_mlflow_server \
+    --user honggildong"
