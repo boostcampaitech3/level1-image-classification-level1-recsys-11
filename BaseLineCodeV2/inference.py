@@ -26,6 +26,21 @@ def load_model(saved_model, num_classes, device):
 
     return model
 
+def load_model_select(saved_model, num_classes, device, which_model):
+    model_cls = getattr(import_module("model"), which_model)
+    model = model_cls(
+        num_classes=num_classes
+    )
+
+    # tarpath = os.path.join(saved_model, 'best.tar.gz')
+    # tar = tarfile.open(tarpath, 'r:gz')
+    # tar.extractall(path=saved_model)
+
+    model_path = os.path.join(saved_model, 'best.pth')
+    model.load_state_dict(torch.load(model_path, map_location=device))
+
+    return model
+
 
 @torch.no_grad()
 def inference(data_dir, model_dir, output_dir, args):
@@ -78,10 +93,13 @@ def inference_by_single_models(which_model, data_dir, model_dir, output_dir, arg
     device = torch.device("cuda" if use_cuda else "cpu")
 
     # which_model should be 'mask' or 'genderAge'
+    model_class = None
     if which_model == 'mask':
         num_classes = 3
+        # model_class = 'MaskSplitByProfileDatasetForAlbumOnlyMask'
     elif which_model == 'genderAge':
         num_classes = 6
+        # model_class = 'MaskSplitByProfileDatasetForAlbumOnlyGenderAge'
     else:
         assert 'no match model type'
 
@@ -108,7 +126,7 @@ def inference_by_single_models(which_model, data_dir, model_dir, output_dir, arg
         drop_last=False,
     )
 
-    print("Calculating inference results.." + which_model)
+    print("Calculating inference " + which_model +  " inference results..")
     preds = []
     with torch.no_grad():
         for idx, images in enumerate(loader):
@@ -118,12 +136,61 @@ def inference_by_single_models(which_model, data_dir, model_dir, output_dir, arg
             preds.extend(pred.cpu().numpy())
 
     info['ans'] = preds
-    save_path = os.path.join(output_dir, f'output' + which_model + '.csv')
+    save_path = os.path.join(output_dir, f'output_' + which_model + '.csv')
     info.to_csv(save_path, index=False)
+    print('Inference ' + which_model + ' complete saved as ' + save_path)
 
-def inference_ensemble():
-    inference_by_single_models('mask')
-    inference_by_single_models('genderAge')
+def ensemble_row(mask, genderAge):
+    mask_str = str(mask)
+    genderAge_str = str(genderAge)
+
+    mask_genderAge_str = mask_str + genderAge_str
+
+    mask_genderAge_dict = {
+        '00' : 0,
+        '01' : 1,
+        '02' : 2,
+        '03' : 3,
+        '04' : 4,
+        '05' : 5,
+        '10' : 6,
+        '11' : 7,
+        '12' : 8,
+        '13' : 9,
+        '14' : 10,
+        '15' : 11,
+        '20' : 12,
+        '21' : 13,
+        '22' : 14,
+        '23' : 15,
+        '24' : 16,
+        '25' : 17,
+    }
+
+    return mask_genderAge_dict[mask_genderAge_str]
+
+def inference_ensemble(data_dir, model_dir, output_dir, args):
+
+    mask_model_dir = input('mask 모델 저장 디렉토리 입력 >> ')
+    genderAge_model_dir = input('genderAge 모델 저장 디렉토리 입력 >> ')
+
+    inference_by_single_models('mask', data_dir, mask_model_dir, output_dir, args)
+    inference_by_single_models('genderAge', data_dir, genderAge_model_dir, output_dir, args)
+
+    df_mask = pd.read_csv(os.path.join(output_dir, f'output_' + 'mask' + '.csv'))
+    df_genderAge = pd.read_csv(os.path.join(output_dir, f'output_' + 'genderAge' + '.csv'))
+
+    df = pd.concat([df_mask, df_genderAge], axis=1, ignore_index=True)
+    df = df.rename(columns={0:'ImageID', 1:'mask_ans', 2:'ImageID2', 3:'genderAge_ans'})
+    df = df.drop('ImageID2', axis=1)
+    df['ans'] = df.apply(lambda x: ensemble_row(x['mask_ans'], x['genderAge_ans']), axis=1)
+    df = df.drop(['mask_ans', 'genderAge_ans'], axis=1)
+
+    save_path = os.path.join(output_dir, f'output_' + 'ensemble' + '.csv')
+    df.to_csv(save_path, index=False)
+    print(f"Inference Done! Inference result saved at {save_path}")
+
+
 
 
 if __name__ == '__main__':
@@ -149,4 +216,10 @@ if __name__ == '__main__':
 
     os.makedirs(output_dir, exist_ok=True)
 
-    inference(data_dir, model_dir, output_dir, args)
+    if args.isEnsemble == 'False':
+        inference(data_dir, model_dir, output_dir, args)
+    elif args.isEnsemble == 'True':
+        inference_ensemble(data_dir, model_dir, output_dir, args)
+    else:
+        assert 'check isEnsemble option (True/False  default:False)'
+
