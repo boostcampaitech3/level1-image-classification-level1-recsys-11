@@ -45,8 +45,37 @@
     batch_size를 줄여나간다. 
 
 ## 🔎 업데이트 노트
+### v.2.1.1
+- **model.py**
+    - (Model) `Vgg11` 추가
+    - (Model) `Vgg11Freeze` 추가 
+    - (Model) `Vgg13` 이름변경 (원래 Vgg13bn)
+    - (Model) `Vgg13Freeze` 이름변경 (원래 Vgg13bnFreeze)
+    - (Model) `Vgg16` 추가
+    - (Model) `Vgg16Freeze` 추가 
+    - (Model) `Inception` 추가
+        - input size is MUST **299x299**
+    - (Model) `ResNet18Dropout` 추가
+        - 기존의 `ResNet18` 모델에서 마지막 FC-layer에 값이 전달되기 전에 Dropout을 달아봤습니다. 
+        - `__init__`에서 (fc) layer에 register_forward_hook을 이용하여, 모델을 직접 print해도 구조에 포함되지는 않습니다. 
 
-### v.2.1.0
+- **dataset.py**
+    - `AugForInception`
+        - 가운데 이미지 사이즈를 299x299로 Crop하고
+        - 각종 인기있는 Albumentation 기능을 사용하여 Augmentation을 만들었습니다. 
+        - 만들어진 목표는 `Inception` 모델을 더 잘 학습시키기 위해서 사용했지만, 현재(2.27) 만들어진 모든 Aug 기법에서 가장 좋은 성능을 보여줍니다.
+
+    - `CustomAlbumentationAug` (Example Aug for module)
+        - Albumentation 에 있는 transform 기능을 사용하고 싶다면 해당 Augmentation 포맷을 사용하여 제작할 수 있습니다. 
+
+    - `MaskSplitByProfileDatasetForAlbum`
+        - MaskSplitByProfileDataset을 통해서 train하고 싶고, Albumentation 모듈로 transform을 사용하는 경우 사용해야할때 사용하는 Dataset입니다.
+        - Albumentation으로 Transform하는 Augmentation을 사용할 경우 해당 Dataset을 사용해주세요
+
+    - `TestDatasetForAlbum` 
+        - 나중에 TTA method 를 구현하기 위해서 미리 Albumentation 전용 TestDataset 모듈을 추가했습니다. 
+        - 해당 모듈을 통해서 Inference 시에 Albumentation의 Augmentation기능을 수행할 수 있습니다.
+    ### v.2.1.0
 MLflow로 원격로깅이 가능해졌습니다.
 
 MLflow 설치  
@@ -57,6 +86,7 @@ pip3 install mlflow
 원격 로깅 주소  
 http://101.101.210.160:30001
 
+
 **mlflow 로깅 사용법**
 
 MLflow 로깅 방법은 노션 docs에 있으니 참고  
@@ -66,7 +96,9 @@ https://www.notion.so/recflix/mlflow-f6390e20a43e474eb5c5ab01ec4c36cf
 
 `experiment_name` 변수에 원하는 실험이름을 정하면 mlflow에 실험등록  
 이미 존재하면 해당 실험에 로그가 저장됨
+
 - **train.py**
+
 ```python
     if __name__ == '__main__':
         parser = argparse.ArgumentParser()
@@ -145,10 +177,10 @@ mlflow run -e main . --no-conda
             LB : f1 0.5607, acc 62.5556
             ```
         - reference: https://github.com/lukemelas/PyTorch-Pretrained-ViT#loading-pretrained-models
-    - (Mode) `Vgg13Bn` 추가
-    - (Mode) `Vgg13BnFreeze` 추가
+    - ~~(Mode) `Vgg13Bn` 추가~~
+    - ~~(Mode) `Vgg13BnFreeze` 추가~~
 
-      - 
+
 - **train.py**
     - argparser로 resize하는 방법 변경(*inference.py*도 같이 변경)
         ```python
