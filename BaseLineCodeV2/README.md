@@ -59,6 +59,12 @@
         - 기존의 `ResNet18` 모델에서 마지막 FC-layer에 값이 전달되기 전에 Dropout을 달아봤습니다. 
         - `__init__`에서 (fc) layer에 register_forward_hook을 이용하여, 모델을 직접 print해도 구조에 포함되지는 않습니다. 
 
+    - (Model) `ResNet18MSD` 추가
+        - ResNet18 Mulit Sample Dropout
+        - ResNet18의 구조를 그대로 사용하고, 5개의 Dropout으로 ResNet의 결과값에 적용하고 Weight를 공유하는 Linear layer에 넣어서 나온 결과값의 평균을 결과값으로 사용하는 모델입니다.
+        - 5개의 dropout layer와 1개의 linear layer로 구성되어있으며, 각 dropout의 percentile = 0.5로 설정했습니다.
+        - 자세한 내용은 다음 캐글 Discussion에서 참고했습니다. [8th Place Solution (4 models simple avg) - Qishen Ha | Jigsaw Unintended Bias in Toxicity Classification](https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification/discussion/100961)
+
 - **dataset.py**
     - `AugForInception`
         - 가운데 이미지 사이즈를 299x299로 Crop하고

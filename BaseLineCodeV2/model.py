@@ -343,6 +343,48 @@ class ResNet18Dropout(nn.Module):
         x = self.resnet18(x)
         return x
 
+class ResNet18MSD(nn.Module):
+    """_summary_
+    Name: Multi-sample Dropout ResNet18-pretrained
+
+    Args:
+        nn (_type_): _description_
+    
+    self.dropout_p = 0.5 (default):  
+        the percentile of each dropout layers
+        
+    self.dropout_n = 5 (default):  
+        the number of dropout layers
+
+
+    ref: https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification/discussion/100961
+    """
+    def __init__(self, num_classes):
+        super().__init__()
+        self.dropout_p = 0.5
+        self.dropout_n = 5
+        self.resnet18 = models.resnet18(pretrained=True)
+        self.dropouts = nn.ModuleList([
+            nn.Dropout(self.dropout_p) for _ in range(self.dropout_n)
+        ])
+        in_features = self.resnet18.fc.out_features
+        self.linear = nn.Linear(in_features=in_features, out_features=num_classes, bias=True)
+
+        # initialize w & b
+        torch.nn.init.xavier_uniform_(self.resnet18.fc.weight)
+        stdv = 1 / math.sqrt(self.resnet18.fc.in_features)
+        self.resnet18.fc.bias.data.uniform_(-stdv, stdv)
+
+    def forward(self, x):
+        x = self.resnet18(x)
+        for i, dropout in enumerate(self.dropouts):
+            if i == 0:
+                h = self.linear(dropout(x))
+            else:
+                h += self.linear(dropout(x))
+        output = h / len(self.dropouts)
+        return output
+
 
 # Custom Model Template
 class MyModel(nn.Module):
