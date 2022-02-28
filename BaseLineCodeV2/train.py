@@ -111,26 +111,43 @@ def train(data_dir, model_dir, args):
     )
     dataset.set_transform(transform)
 
-    # -- data_loader
-    train_set, val_set = dataset.split_dataset()
+    # -- mode ; train mode. If you wanna train All train data, change it to 'all'
+    if args.mode == 'split':
+        # -- data_loader
+        train_set, val_set = dataset.split_dataset()
 
-    train_loader = DataLoader(
-        train_set,
-        batch_size=args.batch_size,
-        num_workers=multiprocessing.cpu_count() // 2,
-        shuffle=True,
-        pin_memory=use_cuda,
-        drop_last=True,
-    )
+        train_loader = DataLoader(
+            train_set,
+            batch_size=args.batch_size,
+            num_workers=multiprocessing.cpu_count() // 2,
+            shuffle=True,
+            pin_memory=use_cuda,
+            drop_last=True,
+        )
 
-    val_loader = DataLoader(
-        val_set,
-        batch_size=args.valid_batch_size,
-        num_workers=multiprocessing.cpu_count() // 2,
-        shuffle=False,
-        pin_memory=use_cuda,
-        drop_last=True,
-    )
+        val_loader = DataLoader(
+            val_set,
+            batch_size=args.valid_batch_size,
+            num_workers=multiprocessing.cpu_count() // 2,
+            shuffle=False,
+            pin_memory=use_cuda,
+            drop_last=True,
+        )
+
+    elif args.mode == 'all':
+        train_set = dataset
+        train_loader = DataLoader(
+            train_set,
+            batch_size=args.batch_size,
+            num_workers=multiprocessing.cpu_count() // 2,
+            shuffle=True,
+            pin_memory=use_cuda,
+            drop_last=True,
+        )
+    else : 
+        raise ValueError("you have only two options in train mode; --mode 'split' or 'all'")
+
+
 
     # -- model
     model_module = getattr(import_module("model"), args.model)  # default: BaseModel
@@ -195,76 +212,79 @@ def train(data_dir, model_dir, args):
                 mlflow.log_metric("Train/loss", train_loss, epoch * len(train_loader) + idx)
                 mlflow.log_metric("Train/accuracy", train_acc, epoch * len(train_loader) + idx)
                 mlflow.log_metric("Train/f1", train_f1, epoch * len(train_loader) + idx)
+                print()
 
                 loss_value = 0
                 matches = 0
 
         scheduler.step()
 
-        # val loop
-        with torch.no_grad():
-            print("Calculating validation results...")
-            model.eval()
-            val_loss_items = []
-            val_acc_items = []
-            val_f1_items = []
+        if args.mode == 'split':
+            # val loop
+            with torch.no_grad():
+                print("Calculating validation results...")
+                model.eval()
+                val_loss_items = []
+                val_acc_items = []
+                val_f1_items = []
 
-            figure = None
-            for val_batch in val_loader:
-                inputs, labels = val_batch
-                inputs = inputs.to(device)
-                labels = labels.to(device)
+                figure = None
+                for val_batch in val_loader:
+                    inputs, labels = val_batch
+                    inputs = inputs.to(device)
+                    labels = labels.to(device)
 
-                outs = model(inputs)
-                preds = torch.argmax(outs, dim=-1)
+                    outs = model(inputs)
+                    preds = torch.argmax(outs, dim=-1)
 
-                loss_item = criterion(outs, labels).item()
-                acc_item = (labels == preds).sum().item()
-                f1_item = f1_score(labels.cpu().numpy(), preds.cpu().numpy(), average= 'macro')
-                val_loss_items.append(loss_item)
-                val_acc_items.append(acc_item)
-                val_f1_items.append(f1_item)
+                    loss_item = criterion(outs, labels).item()
+                    acc_item = (labels == preds).sum().item()
+                    f1_item = f1_score(labels.cpu().numpy(), preds.cpu().numpy(), average= 'macro')
+                    val_loss_items.append(loss_item)
+                    val_acc_items.append(acc_item)
+                    val_f1_items.append(f1_item)
 
-                if figure is None:
-                    inputs_np = torch.clone(inputs).detach().cpu().permute(0, 2, 3, 1).numpy()
-                    inputs_np = dataset_module.denormalize_image(inputs_np, dataset.mean, dataset.std)
-                    figure = grid_image(
-                        inputs_np, labels, preds, n=16, shuffle=args.dataset != "MaskSplitByProfileDataset"
-                    )
+                    if figure is None:
+                        inputs_np = torch.clone(inputs).detach().cpu().permute(0, 2, 3, 1).numpy()
+                        inputs_np = dataset_module.denormalize_image(inputs_np, dataset.mean, dataset.std)
+                        figure = grid_image(
+                            inputs_np, labels, preds, n=16, shuffle=args.dataset != "MaskSplitByProfileDataset"
+                        )
 
-            val_loss = np.sum(val_loss_items) / len(val_loader)
-            val_acc = np.sum(val_acc_items) / len(val_set)
-            val_f1 = np.mean(val_f1_items)
+                val_loss = np.sum(val_loss_items) / len(val_loader)
+                val_acc = np.sum(val_acc_items) / len(val_set)
+                val_f1 = np.mean(val_f1_items)
 
-            best_val_loss = min(best_val_loss, val_loss)
-            best_val_f1  = max(best_val_f1, val_f1)
+                best_val_loss = min(best_val_loss, val_loss)
+                best_val_f1  = max(best_val_f1, val_f1)
 
-            if val_acc > best_val_acc:
-                print(f"New best model for val accuracy : {val_acc:4.4%}! saving the best model..")
-                torch.save(model.module.state_dict(), f"{save_dir}/best.pth")
-                mlflow.pytorch.log_model(model, 'bestModel')
-                best_val_acc = val_acc
+                if val_acc > best_val_acc:
+                    print(f"New best model for val accuracy : {val_acc:4.4%}! saving the best model..")
+                    torch.save(model.module.state_dict(), f"{save_dir}/best.pth")
+                    mlflow.pytorch.log_model(model, 'bestModel')
+                    best_val_acc = val_acc
 
+                torch.save(model.module.state_dict(), f"{save_dir}/last.pth")
+                print(
+                    f"[Val] acc : {val_acc:4.4%}, loss: {val_loss:4.4}, f1 score ['macro'] : {val_f1:4.4}   || "
+                    f"best acc : {best_val_acc:4.4%}, best loss: {best_val_loss:4.4}, best f1 score: {best_val_f1:4.4} ",   
+                )
+                logger.add_scalar("Val/loss", val_loss, epoch)
+                logger.add_scalar("Val/accuracy", val_acc, epoch)
+                logger.add_scalar("Val/f1score(macro)", val_f1, epoch)
+                logger.add_figure("results", figure, epoch)
+
+                mlflow.log_metric("Val/loss", val_loss, epoch)
+                mlflow.log_metric("Val/accuracy", val_acc, epoch)
+                mlflow.log_metric("Val/f1-macro", val_f1, epoch)
+
+                mlflow.log_metric("best Val/loss", best_val_loss, epoch)
+                mlflow.log_metric("best Val/accuracy", best_val_acc, epoch)
+                mlflow.log_metric("best Val/f1-macro", best_val_f1, epoch)
+
+                print()
+        else : 
             torch.save(model.module.state_dict(), f"{save_dir}/last.pth")
-            print(
-                f"[Val] acc : {val_acc:4.4%}, loss: {val_loss:4.4}, f1 score ['macro'] : {val_f1:4.4}   || "
-                f"best acc : {best_val_acc:4.4%}, best loss: {best_val_loss:4.4}, best f1 score: {best_val_f1:4.4} ",   
-            )
-            logger.add_scalar("Val/loss", val_loss, epoch)
-            logger.add_scalar("Val/accuracy", val_acc, epoch)
-            logger.add_scalar("Val/f1score(macro)", val_f1, epoch)
-            logger.add_figure("results", figure, epoch)
-
-            mlflow.log_metric("Val/loss", val_loss, epoch)
-            mlflow.log_metric("Val/accuracy", val_acc, epoch)
-            mlflow.log_metric("Val/f1-macro", val_f1, epoch)
-
-            mlflow.log_metric("best Val/loss", best_val_loss, epoch)
-            mlflow.log_metric("best Val/accuracy", best_val_acc, epoch)
-            mlflow.log_metric("best Val/f1-macro", best_val_f1, epoch)
-
-            print()
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -289,6 +309,8 @@ if __name__ == '__main__':
     parser.add_argument('--lr_decay_step', type=int, default=20, help='learning rate scheduler deacy step (default: 20)')
     parser.add_argument('--log_interval', type=int, default=20, help='how many batches to wait before logging training status')
     parser.add_argument('--name', default='exp', help='model save at {SM_MODEL_DIR}/{name}')
+    parser.add_argument('--mode', default='split', help="choose the method of training using valid or not (default: split. If you want to train using all dataset, change it as 'all')")
+
 
     # Container environment
     parser.add_argument('--data_dir', type=str, default=os.environ.get('SM_CHANNEL_TRAIN', '/opt/ml/input/data/train/images'))
