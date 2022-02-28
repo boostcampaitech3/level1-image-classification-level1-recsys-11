@@ -305,9 +305,10 @@ if __name__ == '__main__':
     experiment = mlflow.get_experiment_by_name(experiment_name)
     client = mlflow.tracking.MlflowClient()
 
-
     run = client.create_run(experiment.experiment_id)
 
     with mlflow.start_run(run_id=run.info.run_id):
+        # mlflow.set_tag('mlflow.runName', run_name)
+        mlflow.set_tag('mlflow.user', 'kijung')
         mlflow.log_params(args.__dict__)
         train(data_dir, model_dir, args)
