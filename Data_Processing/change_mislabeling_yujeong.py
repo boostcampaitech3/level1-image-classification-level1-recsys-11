@@ -17,9 +17,9 @@ def change_file_name(df, idx):
     tmp_src, tmp_dst = before_fold[1].split('.')
     tmp = tmp_src+'_tmp.'+tmp_dst
 
-    os.rename(before_fold[0], tmp)
-    os.rename(before_fold[1], before_fold[0])
-    os.rename(tmp, before_fold[1])
+    shutil.move(before_fold[0], tmp)
+    shutil.move(before_fold[1], before_fold[0])
+    shutil.move(tmp, before_fold[1])
 
 
 ############### 입력 ###############
@@ -54,7 +54,7 @@ for idx in range(len(df)):
     try:
         line = df.iloc[idx]
         if line['type'] == 'file':
-            # change_file_name(df, idx)
+            change_file_name(df, idx)
             print("change file_name - {} [{} <-> {}]!".format(df['error_id'][idx], df['before'][idx], df['after'][idx]))
         elif line['type'] == 'all':
             change_folder_name(df, idx)
