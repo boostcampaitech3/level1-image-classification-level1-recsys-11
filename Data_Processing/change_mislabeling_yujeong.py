@@ -17,9 +17,9 @@ def change_file_name(df, idx):
     tmp_src, tmp_dst = before_fold[1].split('.')
     tmp = tmp_src+'_tmp.'+tmp_dst
 
-    shutil.move(before_fold[0], tmp) 
-    shutil.move(before_fold[1], before_fold[0]) 
-    shutil.move(tmp, before_fold[1]) 
+    shutil.move(before_fold[0], tmp)
+    shutil.move(before_fold[1], before_fold[0])
+    shutil.move(tmp, before_fold[1])
 
 
 ############### 입력 ###############
