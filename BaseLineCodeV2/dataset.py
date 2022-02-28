@@ -13,6 +13,9 @@ from torchvision.transforms import *  # Resize, ToTensor, Normalize, Compose, Ce
 import cv2
 import albumentations as A
 
+from timm.data.auto_augment import auto_augment_transform # auto augment
+from albumentations.pytorch import ToTensorV2
+
 IMG_EXTENSIONS = [
     ".jpg", ".JPG", ".jpeg", ".JPEG", ".png",
     ".PNG", ".ppm", ".PPM", ".bmp", ".BMP",
@@ -66,6 +69,19 @@ class CustomAugmentation:
     def __call__(self, image):
         return self.transform(image)
 
+# https://fastai.github.io/timmdocs/AutoAugment
+class AutoAugmentation:
+    def __init__(self, resize, mean, std, **args):
+        self.transform = Compose([
+            Resize(resize, Image.BILINEAR),
+            auto_augment_transform(config_str='original',
+                                   hparams={'translate_const': 100, 'img_mean': (124, 116, 104)}),
+            ToTensor(),
+            Normalize(mean=mean, std=std),
+        ])
+
+    def __call__(self, image):
+        return self.transform(image)
 
 class MyAugmentationCenter:
     """
@@ -100,11 +116,6 @@ class MyAugmentationBust:
 
     def __call__(self, image):
         return self.transform(image)
-
-
-import albumentations as A
-import cv2
-from albumentations.pytorch import ToTensorV2
 
 
 class GoodAugmentation:
