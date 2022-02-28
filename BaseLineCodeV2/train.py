@@ -212,7 +212,7 @@ def train(data_dir, model_dir, args):
                 mlflow.log_metric("Train/loss", train_loss, epoch * len(train_loader) + idx)
                 mlflow.log_metric("Train/accuracy", train_acc, epoch * len(train_loader) + idx)
                 mlflow.log_metric("Train/f1", train_f1, epoch * len(train_loader) + idx)
-                print()
+                
 
                 loss_value = 0
                 matches = 0
@@ -285,7 +285,7 @@ def train(data_dir, model_dir, args):
                 print()
         else : 
             torch.save(model.module.state_dict(), f"{save_dir}/last.pth")
-
+            print()
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
