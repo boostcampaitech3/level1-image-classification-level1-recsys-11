@@ -310,6 +310,7 @@ if __name__ == '__main__':
     parser.add_argument('--log_interval', type=int, default=20, help='how many batches to wait before logging training status')
     parser.add_argument('--name', default='exp', help='model save at {SM_MODEL_DIR}/{name}')
     parser.add_argument('--mode', default='split', help="choose the method of training using valid or not (default: split. If you want to train using all dataset, change it as 'all')")
+    parser.add_argument('--user', default='unknown', help='set experiment username')
 
 
     # Container environment
@@ -327,9 +328,10 @@ if __name__ == '__main__':
     experiment = mlflow.get_experiment_by_name(experiment_name)
     client = mlflow.tracking.MlflowClient()
 
-
     run = client.create_run(experiment.experiment_id)
 
     with mlflow.start_run(run_id=run.info.run_id):
+        # mlflow.set_tag('mlflow.runName', run_name)
+        mlflow.set_tag('mlflow.user', args.user)
         mlflow.log_params(args.__dict__)
         train(data_dir, model_dir, args)
