@@ -45,9 +45,35 @@
     batch_size를 줄여나간다. 
 
 ## 🔎 업데이트 노트
+### v.2.1.3
+
+마스크 착용 여부(mask) 학습모델과 성별,나이 분류모델(genderAge) 을 앙상블하여 룰베이스로 output을 만드는 inference 코드 추가
+
+**inference 기능 추가**
+
+```bash
+    #앙상블 이용 argument 추가 default값 False -> False시 기존의 inference 방식으로 작동
+    python3 inference.py --isEnsemble True
+```
+
+- **inference.py**
+    - (function) **`inference_by_single_models`**
+    - (parameter) `(which_model, data_dir, model_dir, output_dir, args)`
+        - which_model을 인자로 받아 mask 또는 genderAge 둘 중에 하나를 inference 함
+        - output 디렉토리의 `output_mask.csv` 또는 `output_genderAge.csv` 파일로 결과 저장
+         
+
+    - (function) **`inference_ensemble`**
+    - (parameter) `(data_dir, model_dir, output_dir, args)`
+        - 마스크 분류 모델과 성별 나이 분류 모델을 앙상블하여 최종 제출 파일을 생성
+        - `inference_by_single_models`을 이용하여 각 모델의 결과를 생성하고 그 결과를 이용하여 룰베이스로 최종 제출파일 생성 및 저장
+        - output 디렉토리의 `output_ensemble.csv` 파일로 결과 저장
+    
+
+## 🔎 업데이트 노트
 ### v.2.1.2
 
-모덻 별 데이터 셋 추가 및 MLflow run user 추적기능 추가
+모델 별 데이터 셋 추가 및 MLflow run user 추적기능 추가
 
 **모델 별 데이터 셋 추가**
 - **dataset.py**
@@ -55,6 +81,19 @@
         - 마스크 착용 여부 재 레이블링 하여 데이터를 피딩
          - **Class Description:**
 
+                | Class | 마스크 착용 유형 | 세부 착용 유형 | Counts |
+                | --- | --- | --- | --- |
+                | 0 | Wear | Wear | 2700 X 5 |
+                | 1 | Incorrect | nose mask |  |
+                | 1 | Incorrect | mouse mask |  |
+                | 2 | Not Wear | Not Wear | 2700 X 1 |
+
+        <br>
+
+    - (Dataset) **` MaskSplitByProfileDatasetForAlbumOnlyGenderAge`**
+        - 성별, 나이 두가지 class를 조합하여 재 레이블링하여 데이터를 피딩
+         - **Class Description:**
+         
                 | Class | Gender | Age | Counts |
                 | --- | --- | --- | --- |
                 | 0 | male | < 30 |  |
@@ -63,18 +102,6 @@
                 | 3 | female | < 30 |  |
                 | 4 | female | ≥ 30 and < 60 |  |
                 | 5 | female | ≥ 60 |  |
-        <br>
-
-    - (Dataset) **` MaskSplitByProfileDatasetForAlbumOnlyGenderAge`**
-        - 성별, 나이 두가지 class를 조합하여 재 레이블링하여 데이터를 피딩
-         - **Class Description:**
-         
-                | Class | 마스크 착용 유형 | 세부 착용 유형 | Counts |
-                | --- | --- | --- | --- |
-                | 0 | Wear | Wear | 2700 X 5 |
-                | 1 | Incorrect | nose mask |  |
-                | 1 | Incorrect | mouse mask |  |
-                | 2 | Not Wear | Not Wear | 2700 X 1 |
         <br>
 
 **MLflow run user 추적기능 추가**
