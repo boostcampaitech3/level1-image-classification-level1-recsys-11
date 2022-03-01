@@ -372,7 +372,7 @@ class ResNet18MSD(nn.Module):
 
         # initialize w & b
         torch.nn.init.xavier_uniform_(self.resnet18.fc.weight)
-        stdv = 1 / math.sqrt(self.resnet18.fc.in_features)
+        stdv = 1 / math.sqrt(self.resnet18.fc.in_features) 
         self.resnet18.fc.bias.data.uniform_(-stdv, stdv)
 
     def forward(self, x):
@@ -384,6 +384,111 @@ class ResNet18MSD(nn.Module):
                 h += self.linear(dropout(x))
         output = h / len(self.dropouts)
         return output
+
+
+
+class ResNet18FreezeTop6(nn.Module):
+    """
+    For Overfitting
+    ref. https://www.kaggle.com/sandhyakrishnan02/face-mask-detection-using-torch/notebook
+    """
+    def __init__(self, num_classes):
+        super().__init__()
+        self.model = models.resnet18(pretrained=True)
+        self.model.fc = nn.Linear(in_features=self.model.fc.in_features, out_features=num_classes, bias=True)
+
+        # initialize w & b
+        torch.nn.init.xavier_uniform_(self.model.fc.weight)
+        stdv = 1 / math.sqrt(self.model.fc.in_features)
+        self.model.fc.bias.data.uniform_(-stdv, stdv)
+
+        # freeze top 6 layers
+        for i, child in enumerate(self.model.children()):
+            if i == 6 : break # break point
+            for param in child.parameters():
+                param.requires_grad = False
+
+    def forward(self, x):
+        x = self.model(x)
+        return x
+
+
+
+class ResNet34FreezeTop6(nn.Module):
+    """
+    For Overfitting
+    ref. https://www.kaggle.com/sandhyakrishnan02/face-mask-detection-using-torch/notebook
+    """
+    def __init__(self, num_classes):
+        super().__init__()
+        self.model = models.resnet34(pretrained=True)
+        self.model.fc = nn.Linear(in_features=self.model.fc.in_features, out_features=num_classes, bias=True)
+
+        # initialize w & b
+        torch.nn.init.xavier_uniform_(self.model.fc.weight)
+        stdv = 1 / math.sqrt(self.model.fc.in_features)
+        self.model.fc.bias.data.uniform_(-stdv, stdv)
+
+        # freeze top 6 layers
+        for i, child in enumerate(self.model.children()):
+            if i == 6 : break # break point
+            for param in child.parameters():
+                param.requires_grad = False
+
+    def forward(self, x):
+        x = self.model(x)
+        return x
+
+
+
+class EfficientNetB0FreezeTop6(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        self.efficientnet = models.efficientnet_b0(pretrained=True)
+
+        in_features = self.efficientnet.classifier[1].in_features
+        self.efficientnet.classifier[1] = nn.Linear(in_features=in_features, out_features=num_classes)
+        # self.linear = nn.Linear(in_features = self.efficientnet._fc.out_features, out_features = num_classes)
+
+        # initialize w & b
+        torch.nn.init.xavier_uniform_(self.efficientnet.classifier[1].weight)
+        stdv = 1 / math.sqrt(self.efficientnet.classifier[1].in_features)
+        self.efficientnet.classifier[1].bias.data.uniform_(-stdv, stdv)
+
+        # Freeze Top 6 layers
+        for i, child in enumerate(self.efficientnet.children()):
+            if i == 6 : break # break point; Top 6 layers
+            for param in child.parameters():
+                param.requires_grad = False
+
+    def forward(self, x):
+        x =  self.efficientnet(x)
+        return x
+
+
+class EfficientNetB4FreezeTop6(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        self.efficientnet = models.efficientnet_b4(pretrained=True)
+
+        in_features = self.efficientnet.classifier[1].in_features
+        self.efficientnet.classifier[1] = nn.Linear(in_features=in_features, out_features=num_classes)
+        # self.linear = nn.Linear(in_features = self.efficientnet._fc.out_features, out_features = num_classes)
+
+        # initialize w & b
+        torch.nn.init.xavier_uniform_(self.efficientnet.classifier[1].weight)
+        stdv = 1 / math.sqrt(self.efficientnet.classifier[1].in_features)
+        self.efficientnet.classifier[1].bias.data.uniform_(-stdv, stdv)
+
+        # Freeze Top 6 layers
+        for i, child in enumerate(self.efficientnet.children()):
+            if i == 6 : break # break point; Top 6 layers
+            for param in child.parameters():
+                param.requires_grad = False
+
+    def forward(self, x):
+        x =  self.efficientnet(x)
+        return x
 
 
 # Custom Model Template

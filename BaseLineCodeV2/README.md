@@ -107,6 +107,14 @@ entry_points:
         - ResNet18의 구조를 그대로 사용하고, 5개의 Dropout으로 ResNet의 결과값에 적용하고 Weight를 공유하는 Linear layer에 넣어서 나온 결과값의 평균을 결과값으로 사용하는 모델입니다.
         - 5개의 dropout layer와 1개의 linear layer로 구성되어있으며, 각 dropout의 percentile = 0.5로 설정했습니다.
         - 자세한 내용은 다음 캐글 Discussion에서 참고했습니다. [8th Place Solution (4 models simple avg) - Qishen Ha | Jigsaw Unintended Bias in Toxicity Classification](https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification/discussion/100961)
+        - 2022.03.01) 가중치 초기화 작업이 마지막 레이어에 적용되지 않고, ResNet 밑단을 초기화했음.        
+
+    - 과적합 방지를 위해서 일부 pre-trained layer를 Freeze해줬습니다.
+        - (Model) `ResNet18FreezeTop6` 추가
+        - (Model) `ResNet34FreezeTop6` 추가
+        - (Model) `EfficientNetB0FreezeTop6` 추가
+        - (Model) `EfficientNetB4FreezeTop6` 추가
+    
 
 - **dataset.py**
     - `AugForInception`
