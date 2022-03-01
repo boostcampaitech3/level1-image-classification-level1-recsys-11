@@ -47,7 +47,7 @@
 ## 🔎 업데이트 노트
 ### v.2.1.2
 
-모덻 별 데이터 셋 추가 및 MLflow run user 추적기능 추가
+모델 별 데이터 셋 추가 및 MLflow run user 추적기능 추가
 
 **모델 별 데이터 셋 추가**
 - **dataset.py**
@@ -55,6 +55,19 @@
         - 마스크 착용 여부 재 레이블링 하여 데이터를 피딩
          - **Class Description:**
 
+                | Class | 마스크 착용 유형 | 세부 착용 유형 | Counts |
+                | --- | --- | --- | --- |
+                | 0 | Wear | Wear | 2700 X 5 |
+                | 1 | Incorrect | nose mask |  |
+                | 1 | Incorrect | mouse mask |  |
+                | 2 | Not Wear | Not Wear | 2700 X 1 |
+
+        <br>
+
+    - (Dataset) **` MaskSplitByProfileDatasetForAlbumOnlyGenderAge`**
+        - 성별, 나이 두가지 class를 조합하여 재 레이블링하여 데이터를 피딩
+         - **Class Description:**
+         
                 | Class | Gender | Age | Counts |
                 | --- | --- | --- | --- |
                 | 0 | male | < 30 |  |
@@ -63,18 +76,6 @@
                 | 3 | female | < 30 |  |
                 | 4 | female | ≥ 30 and < 60 |  |
                 | 5 | female | ≥ 60 |  |
-        <br>
-
-    - (Dataset) **` MaskSplitByProfileDatasetForAlbumOnlyGenderAge`**
-        - 성별, 나이 두가지 class를 조합하여 재 레이블링하여 데이터를 피딩
-         - **Class Description:**
-         
-                | Class | 마스크 착용 유형 | 세부 착용 유형 | Counts |
-                | --- | --- | --- | --- |
-                | 0 | Wear | Wear | 2700 X 5 |
-                | 1 | Incorrect | nose mask |  |
-                | 1 | Incorrect | mouse mask |  |
-                | 2 | Not Wear | Not Wear | 2700 X 1 |
         <br>
 
 **MLflow run user 추적기능 추가**
