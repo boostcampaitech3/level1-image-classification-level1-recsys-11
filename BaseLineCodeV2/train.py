@@ -315,12 +315,12 @@ if __name__ == '__main__':
     parser.add_argument('--criterion', type=str, default='cross_entropy', help='criterion type (default: cross_entropy)')
     parser.add_argument('--lr_decay_step', type=int, default=20, help='learning rate scheduler deacy step (default: 20)')
     parser.add_argument('--log_interval', type=int, default=20, help='how many batches to wait before logging training status')
-    parser.add_argument('--name', default='exp', help='model save at {SM_MODEL_DIR}/{name}')
-    parser.add_argument('--mode', default='split', help="choose the method of training using valid or not (default: split. If you want to train using all dataset, change it as 'all')")
-    parser.add_argument('--user', default='unknown', help='set experiment username')
+    parser.add_argument('--name', type=str, default='exp', help='model save at {SM_MODEL_DIR}/{name}')
+    parser.add_argument('--mode',type=str, default='split', help="choose the method of training using valid or not (default: split. If you want to train using all dataset, change it as 'all')")
+    parser.add_argument('--user', type=str, default='unknown', help='set experiment username')
 
     # Container environment
-    parser.add_argument('--experiment', default='general', help='set experiment name (default: general)')
+    parser.add_argument('--experiment', type=str, default='general', help='set experiment name (default: general)')
     parser.add_argument('--data_dir', type=str, default=os.environ.get('SM_CHANNEL_TRAIN', '/opt/ml/input/data/train/images'))
     parser.add_argument('--model_dir', type=str, default=os.environ.get('SM_MODEL_DIR', './model'))
 
@@ -333,9 +333,9 @@ if __name__ == '__main__':
 
     
     experiment_name_dict = {
-        'general'  : "/my-experiment-log2remote", #default
-        'mask'     : "/mask_model_experiment", # Mask Task 
-        'genderAge': "/genderAge_model_experiment" # genderAge Task
+        'general'  : "GENERAL", #default
+        'mask'     : "Mask_model_experiment", # Mask Task 
+        'genderAge': "enderAge_model_experiment" # genderAge Task
     }
     experiment_name = experiment_name_dict[args.experiment]
     mlflow.set_experiment(experiment_name)

@@ -3,8 +3,8 @@ name: first_project
 entry_points:
   main:
     command: "python3 train.py \
-    --experiment mask \ # mask, genderAge, general
-    --dataset MaskSplitByProfileDatasetForAlbumOnlyMask \    # MaskSplitByProfileDatasetForAlbumOnlyMask, MaskSplitByProfileDatasetForAlbumOnlyGenderAge, MaskSplitByProfileDatasetForAlbum 
+    --experiment general \
+    --dataset MaskSplitByProfileDatasetForAlbum \
     --seed 42 \
     --epochs 5 \
     --augmentation AugForInception \
@@ -14,8 +14,8 @@ entry_points:
     --model ResNet18 \ 
     --optimizer AdamW \
     --lr 5e-5 \
-    --criterion cross_entropy \    # focal, label_smoothing, f1
+    --criterion cross_entropy \
     --batch_size 64 \
-    --name Rough_Training_Mask \ 
-    --mode split \    # split, all
-    --user Gyeongtae"    # (your name)
+    --name Rough_Training_general \
+    --mode split \
+    --user Gyeongtae"
