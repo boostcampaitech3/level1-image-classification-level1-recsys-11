@@ -89,6 +89,8 @@ def increment_path(path, exist_ok=False):
 def train(data_dir, model_dir, args):
     seed_everything(args.seed)
 
+    # -- experiment & save dir
+    model_dir = os.path.join(model_dir, args.experiment)
     save_dir = increment_path(os.path.join(model_dir, args.name))
 
     # -- settings
@@ -297,7 +299,6 @@ if __name__ == '__main__':
 
     remote_server_uri ='http://101.101.210.160:30001'
     mlflow.set_tracking_uri(remote_server_uri)
-    experiment_name = "/my-experiment-log2remote"
 
     # Data and model checkpoints directories
     parser.add_argument('--seed', type=int, default=42, help='random seed (default: 42)')
@@ -318,8 +319,8 @@ if __name__ == '__main__':
     parser.add_argument('--mode', default='split', help="choose the method of training using valid or not (default: split. If you want to train using all dataset, change it as 'all')")
     parser.add_argument('--user', default='unknown', help='set experiment username')
 
-
     # Container environment
+    parser.add_argument('--experiment', default='general', help='set experiment name (default: general)')
     parser.add_argument('--data_dir', type=str, default=os.environ.get('SM_CHANNEL_TRAIN', '/opt/ml/input/data/train/images'))
     parser.add_argument('--model_dir', type=str, default=os.environ.get('SM_MODEL_DIR', './model'))
 
@@ -330,6 +331,13 @@ if __name__ == '__main__':
     data_dir = args.data_dir
     model_dir = args.model_dir
 
+    
+    experiment_name_dict = {
+        'general'  : "/my-experiment-log2remote", #default
+        'mask'     : "/mask_model_experiment", # Mask Task 
+        'genderAge': "/genderAge_model_experiment" # genderAge Task
+    }
+    experiment_name = experiment_name_dict[args.experiment]
     mlflow.set_experiment(experiment_name)
     experiment = mlflow.get_experiment_by_name(experiment_name)
     client = mlflow.tracking.MlflowClient()

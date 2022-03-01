@@ -3,12 +3,19 @@ name: first_project
 entry_points:
   main:
     command: "python3 train.py \
-    --optimizer Adam \
-    --epochs 3 \
-    --criterion cross_entropy \
-    --augmentation CustomAlbumentationAug \
-    --dataset MaskSplitByProfileDatasetForAlbumOnlyMask \
-    --model BaseModel \
-    --batch_size 128 \
-    --name test_mlflow_server \
-    --user honggildong"
+    --experiment mask \ # mask, genderAge, general
+    --dataset MaskSplitByProfileDatasetForAlbumOnlyMask \    # MaskSplitByProfileDatasetForAlbumOnlyMask, MaskSplitByProfileDatasetForAlbumOnlyGenderAge, MaskSplitByProfileDatasetForAlbum 
+    --seed 42 \
+    --epochs 5 \
+    --augmentation AugForInception \
+    --resize 224 224 \
+    --batch_size 64 \
+    --valid_batch_size 1000 \
+    --model ResNet18 \ 
+    --optimizer AdamW \
+    --lr 5e-5 \
+    --criterion cross_entropy \    # focal, label_smoothing, f1
+    --batch_size 64 \
+    --name Rough_Training_Mask \ 
+    --mode split \    # split, all
+    --user Gyeongtae"    # (your name)
