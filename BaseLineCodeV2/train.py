@@ -200,18 +200,16 @@ def train(data_dir, model_dir, args):
             if (idx + 1) % args.log_interval == 0:
                 train_loss = loss_value / args.log_interval
                 train_acc = matches / args.batch_size / args.log_interval
-                train_f1 = f1_score(labels.cpu().numpy(), preds.cpu().numpy(), average="macro") ######################### add f1score
+                # train_f1 = f1_score(labels.cpu().numpy(), preds.cpu().numpy(), average="macro") ######################### add f1score
                 current_lr = get_lr(optimizer)
                 print(
                     f"Epoch[{epoch:2}/{args.epochs:2}]({idx + 1:4}/{len(train_loader):4}) || "
-                    f"training loss {train_loss:4.4} || training accuracy {train_acc:4.2%} || training f1 {train_f1:4.4} || lr {current_lr}"
+                    f"training loss {train_loss:4.4} || training accuracy {train_acc:4.2%} || lr {current_lr}"
                 )
                 logger.add_scalar("Train/loss", train_loss, epoch * len(train_loader) + idx)
                 logger.add_scalar("Train/accuracy", train_acc, epoch * len(train_loader) + idx)
-                logger.add_scalar("Train/f1", train_f1, epoch * len(train_loader) + idx)
                 mlflow.log_metric("Train/loss", train_loss, epoch * len(train_loader) + idx)
                 mlflow.log_metric("Train/accuracy", train_acc, epoch * len(train_loader) + idx)
-                mlflow.log_metric("Train/f1", train_f1, epoch * len(train_loader) + idx)
                 
 
                 loss_value = 0
@@ -226,7 +224,8 @@ def train(data_dir, model_dir, args):
                 model.eval()
                 val_loss_items = []
                 val_acc_items = []
-                val_f1_items = []
+                pred_list = [] # for calculating f1 score
+                label_list = [] # for calculating f1 score
 
                 figure = None
                 for val_batch in val_loader:
@@ -236,13 +235,13 @@ def train(data_dir, model_dir, args):
 
                     outs = model(inputs)
                     preds = torch.argmax(outs, dim=-1)
+                    pred_list.extend(preds.cpu().numpy()) # for calculating f1 score
+                    label_list.extend(labels.cpu().numpy()) # for calculating f1 score
 
                     loss_item = criterion(outs, labels).item()
                     acc_item = (labels == preds).sum().item()
-                    f1_item = f1_score(labels.cpu().numpy(), preds.cpu().numpy(), average= 'macro')
                     val_loss_items.append(loss_item)
                     val_acc_items.append(acc_item)
-                    val_f1_items.append(f1_item)
 
                     if figure is None:
                         inputs_np = torch.clone(inputs).detach().cpu().permute(0, 2, 3, 1).numpy()
@@ -253,16 +252,23 @@ def train(data_dir, model_dir, args):
 
                 val_loss = np.sum(val_loss_items) / len(val_loader)
                 val_acc = np.sum(val_acc_items) / len(val_set)
-                val_f1 = np.mean(val_f1_items)
+                val_f1 = f1_score(label_list, pred_list, average= 'macro')
 
                 best_val_loss = min(best_val_loss, val_loss)
-                best_val_f1  = max(best_val_f1, val_f1)
+                # best_val_f1  = max(best_val_f1, val_f1)
 
                 if val_acc > best_val_acc:
                     print(f"New best model for val accuracy : {val_acc:4.4%}! saving the best model..")
                     torch.save(model.module.state_dict(), f"{save_dir}/best.pth")
                     mlflow.pytorch.log_model(model, 'bestModel')
                     best_val_acc = val_acc
+
+                if val_f1 > best_val_f1:
+                    print(f"New best model for val f1-macro : {val_f1:4.4%}! saving the best f1 model..")
+                    torch.save(model.module.state_dict(), f"{save_dir}/best_f1.pth")
+                    mlflow.pytorch.log_model(model, 'bestModel')
+                    best_val_f1 = val_f1
+
 
                 torch.save(model.module.state_dict(), f"{save_dir}/last.pth")
                 print(
