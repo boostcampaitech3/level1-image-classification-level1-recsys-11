@@ -21,10 +21,10 @@ def load_model(saved_model, num_classes, device):
     # tar.extractall(path=saved_model)
     try:
         model_path = os.path.join(saved_model, 'best.pth')
+        model.load_state_dict(torch.load(model_path, map_location=device))
     except:
         model_path = os.path.join(saved_model, 'last.pth')
-    
-    model.load_state_dict(torch.load(model_path, map_location=device))
+        model.load_state_dict(torch.load(model_path, map_location=device))
 
     return model
 
