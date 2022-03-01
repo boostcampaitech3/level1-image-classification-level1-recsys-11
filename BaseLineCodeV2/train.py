@@ -11,6 +11,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import f1_score
+from collections import Counter
 
 import torch
 from torch.optim.lr_scheduler import StepLR
@@ -31,6 +32,13 @@ def seed_everything(seed):
     torch.backends.cudnn.benchmark = False
     np.random.seed(seed)
     random.seed(seed)
+
+
+def divide_except_zero(x, y):
+    try:
+        return x/y
+    except:
+        return 'X'
 
 
 def get_lr(optimizer):
@@ -206,7 +214,7 @@ def train(data_dir, model_dir, args):
                 current_lr = get_lr(optimizer)
                 print(
                     f"Epoch[{epoch:2}/{args.epochs:2}]({idx + 1:4}/{len(train_loader):4}) || "
-                    f"training loss {train_loss:4.4} || training accuracy {train_acc:4.2%} || lr {current_lr}"
+                    f"training loss {train_loss:6.4} || training accuracy {train_acc:6.2%} || lr {current_lr}"
                 )
                 logger.add_scalar("Train/loss", train_loss, epoch * len(train_loader) + idx)
                 logger.add_scalar("Train/accuracy", train_acc, epoch * len(train_loader) + idx)
@@ -277,6 +285,30 @@ def train(data_dir, model_dir, args):
                     f"[Val] acc : {val_acc:4.4%}, loss: {val_loss:4.4}, f1 score ['macro'] : {val_f1:4.4}   || "
                     f"best acc : {best_val_acc:4.4%}, best loss: {best_val_loss:4.4}, best f1 score: {best_val_f1:4.4} ",   
                 )
+                print()
+
+                # initialize the acc of each class
+                class_total = Counter(range(18))
+                class_total.subtract(class_total)
+                class_corrects = class_total.copy()
+
+                class_total.update(Counter(label_list))
+                class_corrects.update(Counter(np.array(label_list)[np.array(label_list) == np.array(pred_list)]))
+
+                for i in range(18):
+                    print(f"| Class {i:2} ",end='')
+                print("|")
+                for i in range(18):
+                    print(f"| {class_corrects[i]:^8} ",end='')
+                print("|")
+                for i in range(18):
+                    print(f"| {class_total[i]:^8} ", end='')
+                print("|")
+                for i in range(18):
+                    print(f"| {divide_except_zero(class_corrects[i], class_total[i]):^8.4} ",end='')
+                print("|")
+
+
                 logger.add_scalar("Val/loss", val_loss, epoch)
                 logger.add_scalar("Val/accuracy", val_acc, epoch)
                 logger.add_scalar("Val/f1score(macro)", val_f1, epoch)

@@ -49,6 +49,7 @@
 
 ### v.2.1.4
 - **train.py**
+    - (03.02) Class간 예측 정확도(Accuracy)를 확인하고, 이를 통해서 Weight를 부여하기 위한 작업을 하기 위해, train 중, Validation에서 Class간 정확도를 가시적으로 확인할 수 있는 로그를 만들었습니다.
     - 학습시 f1 score 수정  
         train 시에 임시로 학습과정에서 f1 score를 볼 수 있게 설정해놨는데, Batch size 단위로 f1 score로 보는 것은, forum에서도 언급된 바와 같이, 그 값의 신뢰성이 떨어집니다. 그래서 training 시 batch 단위의 f1 score를 폐기하고, validation의 경우에는 기존에 batch 단위로 기록되어 평균을 구하는 방식으로 기록하였었는데, 이 부분도, Metric의 정확한 의도 전달을 위해서 전체 validation set에 대한 f1 score를 기록하도록 하였습니다. 
     - 개편된 f1 score로 Best f1 score의 모델 파라미터 정보를 `best_f1.pth`로 기록할 수 있게 되었습니다. 
