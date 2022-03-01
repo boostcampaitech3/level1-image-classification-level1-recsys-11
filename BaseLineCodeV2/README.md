@@ -45,6 +45,21 @@
     batch_size를 줄여나간다. 
 
 ## 🔎 업데이트 노트
+
+### v.2.1.3
+- **train.py**
+    - 학습시 f1 score 수정  
+        train 시에 임시로 학습과정에서 f1 score를 볼 수 있게 설정해놨는데, Batch size 단위로 f1 score로 보는 것은, forum에서도 언급된 바와 같이, 그 값의 신뢰성이 떨어집니다. 그래서 training 시 batch 단위의 f1 score를 폐기하고, validation의 경우에는 기존에 batch 단위로 기록되어 평균을 구하는 방식으로 기록하였었는데, 이 부분도, Metric의 정확한 의도 전달을 위해서 전체 validation set에 대한 f1 score를 기록하도록 하였습니다. 
+    - 개편된 f1 score로 Best f1 score의 모델 파라미터 정보를 `best_f1.pth`로 기록할 수 있게 되었습니다. 
+
+- **inference.py**
+    - (argparser) `--state`  
+        기존에는 학습된 모델을 acc metric 최고 성능 기준인 `best.pth`를 기준으로 추론하도록 설정되어있었지만, `best_f1.pth`, `last.pth` 중에서도 골라서 사용할 수 있도록 하였습니다. 
+        - `best.pth`: acc 기준으로 최고 성능을 나타낸 state를 불러옵니다. 
+        - `best_f1.pth`: f1(macro) 기준으로 최고성능을 나타낸 state를 불러옵니다.
+        - `last.pth`: 마지막 epoch 학습의 state를 불러옵니다. 
+
+
 ### v.2.1.2
 
 모덻 별 데이터 셋 추가 및 MLflow run user 추적기능 추가
