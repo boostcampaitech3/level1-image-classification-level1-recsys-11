@@ -19,12 +19,13 @@ def load_model(saved_model, num_classes, device):
     # tarpath = os.path.join(saved_model, 'best.tar.gz')
     # tar = tarfile.open(tarpath, 'r:gz')
     # tar.extractall(path=saved_model)
-    try:
-        model_path = os.path.join(saved_model, 'best.pth')
-        model.load_state_dict(torch.load(model_path, map_location=device))
-    except:
-        model_path = os.path.join(saved_model, 'last.pth')
-        model.load_state_dict(torch.load(model_path, map_location=device))
+
+    model_path = os.path.join(saved_model, args.state+'.pth' ) # default : best.pth
+    model.load_state_dict(torch.load(model_path, map_location=device))
+
+    # model_path = os.path.join(saved_model, 'best.pth')
+    # model.load_state_dict(torch.load(model_path, map_location=device))
+
 
     return model
 
@@ -83,6 +84,7 @@ if __name__ == '__main__':
     parser.add_argument('--resize', nargs="+", type=int, default=[96, 128], help='resize size for image when you trained (default: (96, 128))')
     parser.add_argument('--model', type=str, default='BaseModel', help='model type (default: BaseModel)')
     parser.add_argument('--dataset', type=str, default='TestDataset', help='TestDataset with data augmentation  (default: TestDataset)')
+    parser.add_argument('--state', type=str, default='best', help='which state do you want to use. options are `best`, `last`, `best_1` (default: best)')
 
     # Container environment
     parser.add_argument('--data_dir', type=str, default=os.environ.get('SM_CHANNEL_EVAL', '/opt/ml/input/data/eval'))
