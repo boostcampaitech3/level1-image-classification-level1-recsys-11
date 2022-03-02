@@ -2,7 +2,8 @@ import torch
 from torchvision import models
 import torch.nn as nn
 import torch.nn.functional as F
-
+from efficientnet_pytorch import EfficientNet
+import math
 
 def set_parameter_requires_grad(model, feature_extracting):
     if feature_extracting:
@@ -81,8 +82,7 @@ class ResNet18Freeze(nn.Module):
 
 
 # EfficientNet
-from efficientnet_pytorch import EfficientNet
-import math
+
 
 
 class EfficientNetB3(nn.Module):
@@ -113,6 +113,24 @@ class EfficientNetB3Freeze(nn.Module):
             param.requires_grad = False
 
         # Drop out will be added Here
+        in_features = self.efficientnet._fc.in_features
+        self.efficientnet._fc = nn.Linear(in_features=in_features, out_features=num_classes)
+        # self.linear = nn.Linear(in_features = self.efficientnet._fc.out_features, out_features = num_classes)
+
+        # initialize w & b
+        torch.nn.init.xavier_uniform_(self.efficientnet._fc.weight)
+        stdv = 1 / math.sqrt(self.efficientnet._fc.in_features)
+        self.efficientnet._fc.bias.data.uniform_(-stdv, stdv)
+
+    def forward(self, x):
+        x = self.efficientnet(x)
+        return x
+    
+class EfficientNetB7(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        self.efficientnet = EfficientNet.from_pretrained('efficientnet-b7')
+
         in_features = self.efficientnet._fc.in_features
         self.efficientnet._fc = nn.Linear(in_features=in_features, out_features=num_classes)
         # self.linear = nn.Linear(in_features = self.efficientnet._fc.out_features, out_features = num_classes)
@@ -492,7 +510,7 @@ class EfficientNetB4FreezeTop3(nn.Module):
         x =  self.efficientnet(x)
         return x
 
-
+'''
 class EfficientNetB3(nn.Module):
     """_summary_
     size recommended to 300
@@ -513,7 +531,7 @@ class EfficientNetB3(nn.Module):
     def forward(self, x):
         x =  self.efficientnet(x)
         return x
-
+'''
 
 # Custom Model Template
 class MyModel(nn.Module):
