@@ -311,13 +311,13 @@ class MaskBaseDataset(Dataset):
     num_classes = 3 * 2 * 3
 
     _file_names = {
-        "mask1": MaskLabels.MASK,
-        "mask2": MaskLabels.MASK,
-        "mask3": MaskLabels.MASK,
-        "mask4": MaskLabels.MASK,
-        "mask5": MaskLabels.MASK,
-        "incorrect_mask": MaskLabels.INCORRECT,
-        "normal": MaskLabels.NORMAL
+        "mask1": MaskLabels.MASK, "rmask1": MaskLabels.MASK,
+        "mask2": MaskLabels.MASK, "rmask2": MaskLabels.MASK,
+        "mask3": MaskLabels.MASK, "rmask3": MaskLabels.MASK,
+        "mask4": MaskLabels.MASK, "rmask4": MaskLabels.MASK,
+        "mask5": MaskLabels.MASK, "rmask5": MaskLabels.MASK,
+        "incorrect_mask": MaskLabels.INCORRECT, "rincorrect_mask": MaskLabels.INCORRECT,
+        "normal": MaskLabels.NORMAL, "rnormal": MaskLabels.NORMAL,
     }
 
     def __init__(self, data_dir, mean=(0.548, 0.504, 0.479), std=(0.237, 0.247, 0.246), val_ratio=0.2):
