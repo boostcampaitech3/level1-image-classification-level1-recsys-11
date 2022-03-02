@@ -533,6 +533,57 @@ class EfficientNetB3(nn.Module):
         return x
 '''
 
+class EfficientNetB3MSD(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        self.dropout_p = 0.5
+        self.dropout_n = 5
+        self.efficientnet = models.efficientnet_b3(pretrained=True)
+
+        self.dropouts = nn.ModuleList([
+            nn.Dropout(self.dropout_p) for _ in range(self.dropout_n)
+        ])
+        
+        in_features = self.efficientnet.classifier[1].out_features
+        self.linear = nn.Linear(in_features=in_features, out_features=num_classes)
+
+        # initialize w & b
+        torch.nn.init.xavier_uniform_(self.linear.weight)
+        stdv = 1 / math.sqrt(self.linear.in_features)
+        self.linear.bias.data.uniform_(-stdv, stdv)
+
+    def forward(self, x):
+        x = self.efficientnet(x)
+        for i, dropout in enumerate(self.dropouts):
+            if i == 0:
+                h = self.linear(dropout(x))
+            else:
+                h += self.linear(dropout(x))
+        output = h / len(self.dropouts)
+        return output
+
+
+class EfficientNetB7(nn.Module):
+    """_summary_
+    size recommended to 600
+    """
+    def __init__(self, num_classes):
+        super().__init__()
+        self.efficientnet = models.efficientnet_b7(pretrained=True)
+
+        in_features = self.efficientnet.classifier[1].in_features
+        self.efficientnet.classifier[1] = nn.Linear(in_features=in_features, out_features=num_classes)
+        # self.linear = nn.Linear(in_features = self.efficientnet._fc.out_features, out_features = num_classes)
+
+        # initialize w & b
+        torch.nn.init.xavier_uniform_(self.efficientnet.classifier[1].weight)
+        stdv = 1 / math.sqrt(self.efficientnet.classifier[1].in_features)
+        self.efficientnet.classifier[1].bias.data.uniform_(-stdv, stdv)
+
+    def forward(self, x):
+        x =  self.efficientnet(x)
+        return x
+
 # Custom Model Template
 class MyModel(nn.Module):
     def __init__(self, num_classes):
