@@ -3,6 +3,7 @@ import random
 from collections import defaultdict
 from enum import Enum
 from typing import Tuple, List
+from matplotlib.pyplot import sca
 
 import numpy as np
 import torch
@@ -181,6 +182,50 @@ class CustomAlbumentationAug:
     def __call__(self, image):
         return self.transform(image=image)['image']
 
+class myAlbumentationAug:
+    """
+    albumentations 모듈을 활용한 방법.
+    """
+    def __init__(self, resize, mean, std, **args):
+        self.transform = A.Compose([
+            A.ShiftScaleRotate(shift_limit=0.625, scale_limit=(-0.2,0), rotate_limit=2),
+            A.CenterCrop(360, 360),
+            A.Resize(*resize),
+            A.RandomBrightnessContrast(brightness_limit=(0, 0.2), contrast_limit=(0.1, 0.3)),
+            A.GridDistortion(),
+            A.CLAHE(),
+            A.HorizontalFlip(),
+            A.CoarseDropout(),
+            A.GaussNoise(),
+            A.Normalize(mean=mean, std=std),
+            ToTensorV2()
+        ])
+
+    def __call__(self, image):
+        return self.transform(image=image)['image']
+
+class BestAugForAlbum:
+    """
+    albumentations 모듈을 활용한 방법.
+    """
+    def __init__(self, resize, mean, std, **args):
+        self.transform = A.Compose([
+            A.ShiftScaleRotate(shift_limit=0.075, scale_limit=(-0.3,0), rotate_limit=2),
+            A.CenterCrop(360, 360),
+            A.Resize(*resize),
+            A.RandomBrightnessContrast(brightness_limit=(0, 0.1), contrast_limit=(0.1, 0.3)),
+            A.GridDistortion(),
+            A.CLAHE(),
+            A.HorizontalFlip(),
+            A.CoarseDropout(max_holes=5, max_height=20, max_width=40),
+            A.GaussNoise(),
+            A.Normalize(mean=mean, std=std),
+            ToTensorV2()
+        ])
+
+    def __call__(self, image):
+        return self.transform(image=image)['image']
+
 
 class MaskLabels(int, Enum):
     MASK = 0
@@ -217,7 +262,7 @@ class AgeLabels(int, Enum):
 
         if value < 30:
             return cls.YOUNG
-        elif value < 60:
+        elif value < 59: ############################# change for class imbalace
             return cls.MIDDLE
         else:
             return cls.OLD

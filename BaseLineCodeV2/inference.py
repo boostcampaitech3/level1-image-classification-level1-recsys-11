@@ -21,8 +21,9 @@ def load_model(saved_model, num_classes, device):
     # tar = tarfile.open(tarpath, 'r:gz')
     # tar.extractall(path=saved_model)
 
-    model_path = os.path.join(saved_model, 'best.pth')
+    model_path = os.path.join(saved_model, args.state+'.pth' ) # default : best.pth
     model.load_state_dict(torch.load(model_path, map_location=device))
+
 
     return model
 
@@ -36,7 +37,7 @@ def load_model_select(saved_model, num_classes, device, which_model):
     # tar = tarfile.open(tarpath, 'r:gz')
     # tar.extractall(path=saved_model)
 
-    model_path = os.path.join(saved_model, 'best.pth')
+    model_path = os.path.join(saved_model, args.state+'.pth')
     model.load_state_dict(torch.load(model_path, map_location=device))
 
     return model
@@ -201,6 +202,7 @@ if __name__ == '__main__':
     parser.add_argument('--resize', nargs="+", type=int, default=[96, 128], help='resize size for image when you trained (default: (96, 128))')
     parser.add_argument('--model', type=str, default='BaseModel', help='model type (default: BaseModel)')
     parser.add_argument('--dataset', type=str, default='TestDataset', help='TestDataset with data augmentation  (default: TestDataset)')
+    parser.add_argument('--state', type=str, default='best', help='which state do you want to use. options are `best`, `last`, `best_f1` (default: best)')
     parser.add_argument('--isEnsemble', type=str, default='False', help='Inference tpye True / False  (default: False)')
 
     # Container environment
