@@ -3,7 +3,7 @@ import torch
 
 class EarlyStopping:
     """주어진 patience 이후로 validation loss가 개선되지 않으면 학습을 조기 중지"""
-    def __init__(self, patience=7, verbose=False, delta=0, path='checkpoint.pt'):
+    def __init__(self, patience=7, verbose=False, delta=0, path='checkpoint.pth'):
         """
         Args:
             patience (int): validation loss가 개선된 후 기다리는 기간
