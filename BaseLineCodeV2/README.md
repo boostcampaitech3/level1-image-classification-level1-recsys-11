@@ -45,9 +45,50 @@
     batch_size를 줄여나간다. 
 
 ## 🔎 업데이트 노트
+<<<<<<< HEAD
+
+### v.2.1.4
+- **train.py**
+    - (03.02) Class간 예측 정확도(Accuracy)를 확인하고, 이를 통해서 Weight를 부여하기 위한 작업을 하기 위해, train 중, Validation에서 Class간 정확도를 가시적으로 확인할 수 있는 로그를 만들었습니다.
+    - 학습시 f1 score 수정  
+        train 시에 임시로 학습과정에서 f1 score를 볼 수 있게 설정해놨는데, Batch size 단위로 f1 score로 보는 것은, forum에서도 언급된 바와 같이, 그 값의 신뢰성이 떨어집니다. 그래서 training 시 batch 단위의 f1 score를 폐기하고, validation의 경우에는 기존에 batch 단위로 기록되어 평균을 구하는 방식으로 기록하였었는데, 이 부분도, Metric의 정확한 의도 전달을 위해서 전체 validation set에 대한 f1 score를 기록하도록 하였습니다. 
+    - 개편된 f1 score로 Best f1 score의 모델 파라미터 정보를 `best_f1.pth`로 기록할 수 있게 되었습니다. 
+
+- **inference.py**
+    - (argparser) `--state`  
+        기존에는 학습된 모델을 acc metric 최고 성능 기준인 `best.pth`를 기준으로 추론하도록 설정되어있었지만, `best_f1.pth`, `last.pth` 중에서도 골라서 사용할 수 있도록 하였습니다. 
+        - `best.pth`: acc 기준으로 최고 성능을 나타낸 state를 불러옵니다. 
+        - `best_f1.pth`: f1(macro) 기준으로 최고성능을 나타낸 state를 불러옵니다.
+        - `last.pth`: 마지막 epoch 학습의 state를 불러옵니다. 
+
+### v.2.1.3
+
+마스크 착용 여부(mask) 학습모델과 성별,나이 분류모델(genderAge) 을 앙상블하여 룰베이스로 output을 만드는 inference 코드 추가
+
+**inference 기능 추가**
+
+```bash
+    #앙상블 이용 argument 추가 default값 False -> False시 기존의 inference 방식으로 작동
+    python3 inference.py --isEnsemble True
+```
+
+- **inference.py**
+    - (function) **`inference_by_single_models`**
+    - (parameter) `(which_model, data_dir, model_dir, output_dir, args)`
+        - which_model을 인자로 받아 mask 또는 genderAge 둘 중에 하나를 inference 함
+        - output 디렉토리의 `output_mask.csv` 또는 `output_genderAge.csv` 파일로 결과 저장
+         
+
+    - (function) **`inference_ensemble`**
+    - (parameter) `(data_dir, model_dir, output_dir, args)`
+        - 마스크 분류 모델과 성별 나이 분류 모델을 앙상블하여 최종 제출 파일을 생성
+        - `inference_by_single_models`을 이용하여 각 모델의 결과를 생성하고 그 결과를 이용하여 룰베이스로 최종 제출파일 생성 및 저장
+        - output 디렉토리의 `output_ensemble.csv` 파일로 결과 저장
+    
+
 ### v.2.1.2
 
-모덻 별 데이터 셋 추가 및 MLflow run user 추적기능 추가
+모델 별 데이터 셋 추가 및 MLflow run user 추적기능 추가
 
 **모델 별 데이터 셋 추가**
 - **dataset.py**
@@ -55,6 +96,19 @@
         - 마스크 착용 여부 재 레이블링 하여 데이터를 피딩
          - **Class Description:**
 
+                | Class | 마스크 착용 유형 | 세부 착용 유형 | Counts |
+                | --- | --- | --- | --- |
+                | 0 | Wear | Wear | 2700 X 5 |
+                | 1 | Incorrect | nose mask |  |
+                | 1 | Incorrect | mouse mask |  |
+                | 2 | Not Wear | Not Wear | 2700 X 1 |
+
+        <br>
+
+    - (Dataset) **` MaskSplitByProfileDatasetForAlbumOnlyGenderAge`**
+        - 성별, 나이 두가지 class를 조합하여 재 레이블링하여 데이터를 피딩
+         - **Class Description:**
+         
                 | Class | Gender | Age | Counts |
                 | --- | --- | --- | --- |
                 | 0 | male | < 30 |  |
@@ -63,18 +117,6 @@
                 | 3 | female | < 30 |  |
                 | 4 | female | ≥ 30 and < 60 |  |
                 | 5 | female | ≥ 60 |  |
-        <br>
-
-    - (Dataset) **` MaskSplitByProfileDatasetForAlbumOnlyGenderAge`**
-        - 성별, 나이 두가지 class를 조합하여 재 레이블링하여 데이터를 피딩
-         - **Class Description:**
-         
-                | Class | 마스크 착용 유형 | 세부 착용 유형 | Counts |
-                | --- | --- | --- | --- |
-                | 0 | Wear | Wear | 2700 X 5 |
-                | 1 | Incorrect | nose mask |  |
-                | 1 | Incorrect | mouse mask |  |
-                | 2 | Not Wear | Not Wear | 2700 X 1 |
         <br>
 
 **MLflow run user 추적기능 추가**
@@ -101,6 +143,23 @@ entry_points:
     - (Model) `ResNet18Dropout` 추가
         - 기존의 `ResNet18` 모델에서 마지막 FC-layer에 값이 전달되기 전에 Dropout을 달아봤습니다. 
         - `__init__`에서 (fc) layer에 register_forward_hook을 이용하여, 모델을 직접 print해도 구조에 포함되지는 않습니다. 
+
+    - (Model) `ResNet18MSD` 추가
+        - ResNet18 Mulit Sample Dropout
+        - ResNet18의 구조를 그대로 사용하고, 5개의 Dropout으로 ResNet의 결과값에 적용하고 Weight를 공유하는 Linear layer에 넣어서 나온 결과값의 평균을 결과값으로 사용하는 모델입니다.
+        - 5개의 dropout layer와 1개의 linear layer로 구성되어있으며, 각 dropout의 percentile = 0.5로 설정했습니다.
+        - 자세한 내용은 다음 캐글 Discussion에서 참고했습니다. [8th Place Solution (4 models simple avg) - Qishen Ha | Jigsaw Unintended Bias in Toxicity Classification](https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification/discussion/100961)
+    - 2022.03.01) 가중치 초기화 작업이 마지막 레이어에 적용되지 않고, ResNet 밑단을 초기화했음.        
+    - (Model) `EfficientNetB3` 추가
+        - image size : 300 (recommended)
+    - 과적합 방지를 위해서 일부 pre-trained layer를 Freeze해줬습니다.
+        - (Model) `ResNet18FreezeTop6` 추가
+        - (Model) `ResNet34FreezeTop6` 추가
+        - (Model) `EfficientNetB0FreezeTop3` 추가
+            - image size : 224 (recommended)
+        - (Model) `EfficientNetB4FreezeTop3` 추가
+            - image size : 380 (recommended)
+    
 
 - **dataset.py**
     - `AugForInception`

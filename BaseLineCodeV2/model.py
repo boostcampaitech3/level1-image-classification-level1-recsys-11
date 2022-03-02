@@ -343,6 +343,177 @@ class ResNet18Dropout(nn.Module):
         x = self.resnet18(x)
         return x
 
+class ResNet18MSD(nn.Module):
+    """_summary_
+    Name: Multi-sample Dropout ResNet18-pretrained
+
+    Args:
+        nn (_type_): _description_
+    
+    self.dropout_p = 0.5 (default):  
+        the percentile of each dropout layers
+        
+    self.dropout_n = 5 (default):  
+        the number of dropout layers
+
+
+    ref: https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification/discussion/100961
+    """
+    def __init__(self, num_classes):
+        super().__init__()
+        self.dropout_p = 0.5
+        self.dropout_n = 5
+        self.resnet18 = models.resnet18(pretrained=True)
+        self.dropouts = nn.ModuleList([
+            nn.Dropout(self.dropout_p) for _ in range(self.dropout_n)
+        ])
+        in_features = self.resnet18.fc.out_features
+        self.linear = nn.Linear(in_features=in_features, out_features=num_classes, bias=True)
+
+        # initialize w & b
+        torch.nn.init.xavier_uniform_(self.linear.weight)
+        stdv = 1 / math.sqrt(self.linear.in_features) 
+        self.linear.bias.data.uniform_(-stdv, stdv)
+
+    def forward(self, x):
+        x = self.resnet18(x)
+        for i, dropout in enumerate(self.dropouts):
+            if i == 0:
+                h = self.linear(dropout(x))
+            else:
+                h += self.linear(dropout(x))
+        output = h / len(self.dropouts)
+        return output
+
+
+class ResNet18FreezeTop6(nn.Module):
+    """
+    For Overfitting
+    ref. https://www.kaggle.com/sandhyakrishnan02/face-mask-detection-using-torch/notebook
+    """
+    def __init__(self, num_classes):
+        super().__init__()
+        self.model = models.resnet18(pretrained=True)
+        self.model.fc = nn.Linear(in_features=self.model.fc.in_features, out_features=num_classes, bias=True)
+
+        # initialize w & b
+        torch.nn.init.xavier_uniform_(self.model.fc.weight)
+        stdv = 1 / math.sqrt(self.model.fc.in_features)
+        self.model.fc.bias.data.uniform_(-stdv, stdv)
+
+        # freeze top 6 layers
+        for i, child in enumerate(self.model.children()):
+            if i == 6 : break # break point
+            for param in child.parameters():
+                param.requires_grad = False
+
+    def forward(self, x):
+        x = self.model(x)
+        return x
+
+
+class ResNet34FreezeTop6(nn.Module):
+    """
+    For Overfitting
+    ref. https://www.kaggle.com/sandhyakrishnan02/face-mask-detection-using-torch/notebook
+    """
+    def __init__(self, num_classes):
+        super().__init__()
+        self.model = models.resnet34(pretrained=True)
+        self.model.fc = nn.Linear(in_features=self.model.fc.in_features, out_features=num_classes, bias=True)
+
+        # initialize w & b
+        torch.nn.init.xavier_uniform_(self.model.fc.weight)
+        stdv = 1 / math.sqrt(self.model.fc.in_features)
+        self.model.fc.bias.data.uniform_(-stdv, stdv)
+
+        # freeze top 6 layers
+        for i, child in enumerate(self.model.children()):
+            if i == 6 : break # break point
+            for param in child.parameters():
+                param.requires_grad = False
+
+    def forward(self, x):
+        x = self.model(x)
+        return x
+
+
+class EfficientNetB0FreezeTop3(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        self.efficientnet = models.efficientnet_b0(pretrained=True)
+
+        in_features = self.efficientnet.classifier[1].in_features
+        self.efficientnet.classifier[1] = nn.Linear(in_features=in_features, out_features=num_classes)
+        # self.linear = nn.Linear(in_features = self.efficientnet._fc.out_features, out_features = num_classes)
+
+        # initialize w & b
+        torch.nn.init.xavier_uniform_(self.efficientnet.classifier[1].weight)
+        stdv = 1 / math.sqrt(self.efficientnet.classifier[1].in_features)
+        self.efficientnet.classifier[1].bias.data.uniform_(-stdv, stdv)
+
+        # Freeze Top 6 layers
+        for i, child in enumerate(self.efficientnet.children()):
+            if i == 6 : break # break point; Top 6 layers
+            for param in child.parameters():
+                param.requires_grad = False
+
+    def forward(self, x):
+        x =  self.efficientnet(x)
+        return x
+
+
+class EfficientNetB4FreezeTop3(nn.Module):
+    """_summary_
+    size recommended to 380
+    Args:
+        nn (_type_): _description_
+    """
+    def __init__(self, num_classes):
+        super().__init__()
+        self.efficientnet = models.efficientnet_b4(pretrained=True)
+
+        in_features = self.efficientnet.classifier[1].in_features
+        self.efficientnet.classifier[1] = nn.Linear(in_features=in_features, out_features=num_classes)
+        # self.linear = nn.Linear(in_features = self.efficientnet._fc.out_features, out_features = num_classes)
+
+        # initialize w & b
+        torch.nn.init.xavier_uniform_(self.efficientnet.classifier[1].weight)
+        stdv = 1 / math.sqrt(self.efficientnet.classifier[1].in_features)
+        self.efficientnet.classifier[1].bias.data.uniform_(-stdv, stdv)
+
+        # Freeze Top 6 layers
+        for i, child in enumerate(self.efficientnet.features.children()):
+            if i == 3 : break # break point; Top 6 layers
+            for param in child.parameters():
+                param.requires_grad = False
+
+    def forward(self, x):
+        x =  self.efficientnet(x)
+        return x
+
+
+class EfficientNetB3(nn.Module):
+    """_summary_
+    size recommended to 300
+    """
+    def __init__(self, num_classes):
+        super().__init__()
+        self.efficientnet = models.efficientnet_b3(pretrained=True)
+
+        in_features = self.efficientnet.classifier[1].in_features
+        self.efficientnet.classifier[1] = nn.Linear(in_features=in_features, out_features=num_classes)
+        # self.linear = nn.Linear(in_features = self.efficientnet._fc.out_features, out_features = num_classes)
+
+        # initialize w & b
+        torch.nn.init.xavier_uniform_(self.efficientnet.classifier[1].weight)
+        stdv = 1 / math.sqrt(self.efficientnet.classifier[1].in_features)
+        self.efficientnet.classifier[1].bias.data.uniform_(-stdv, stdv)
+
+    def forward(self, x):
+        x =  self.efficientnet(x)
+        return x
+
 
 # Custom Model Template
 class MyModel(nn.Module):
