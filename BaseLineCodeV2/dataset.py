@@ -226,6 +226,45 @@ class BestAugForAlbum:
     def __call__(self, image):
         return self.transform(image=image)['image']
 
+class BJAugForAlbum:
+    """
+    albumentations 모듈을 활용한 방법.
+    """
+    def __init__(self, resize, mean, std, **args):
+        self.transform = A.Compose([
+            A.OneOf([
+            A.ShiftScaleRotate(shift_limit=0.06, scale_limit=(-0.3,0.1), rotate_limit=2, border_mode=cv2.BORDER_CONSTANT),
+            A.RandomResizedCrop(always_apply=False, height=512, width=384, scale=(0.65, 1.0), ratio=(0.25, 1.8), interpolation=0),
+            ], p=0.6),
+
+            A.CenterCrop(360, 360),
+            A.Resize(*resize),
+
+            A.OneOf([
+            A.RGBShift(always_apply=False, p=0.8, r_shift_limit=(-10, 10), g_shift_limit=(-10, 10), b_shift_limit=(-10, 10)),
+            A.HueSaturationValue(always_apply=False, p=0.8, hue_shift_limit=(-10, 10), sat_shift_limit=(-10, 10), val_shift_limit=(-10, 10)),
+            A.CLAHE(always_apply=False, p=1, clip_limit=(2, 4), tile_grid_size=(8, 15)),
+            A.Blur(always_apply=False, p=0.2, blur_limit=(2, 3)),
+            ],p=0.8),
+
+            A.RandomBrightnessContrast(always_apply=False, p=0.6, brightness_limit=(-0.05, 0.2), contrast_limit=(-0.05, 0.3), brightness_by_max=True),
+
+            A.GridDistortion(always_apply=False, p=0.15, num_steps=15, distort_limit=(-0.1, 0.1)),
+            
+            A.HorizontalFlip(),
+
+            A.OneOf([
+            A.CoarseDropout(max_holes=5, max_height=21, max_width=37),
+            A.GaussNoise(var_limit=(10, 70), mean=0),
+            A.RandomFog(always_apply=False, fog_coef_lower=0.23, fog_coef_upper=0.28, alpha_coef=0.3),
+            ],p=0.75),
+            
+            A.Normalize(mean=mean, std=std),
+            ToTensorV2()
+        ])
+
+    def __call__(self, image):
+        return self.transform(image=image)['image']
 
 class MaskLabels(int, Enum):
     MASK = 0
