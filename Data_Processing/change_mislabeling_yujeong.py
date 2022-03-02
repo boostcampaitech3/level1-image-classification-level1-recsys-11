@@ -6,7 +6,7 @@ def change_folder_name(df, idx):
     id_ = df['error_id'][idx]    
 
     before_fold = [os.path.join(folder_dir, folder) for folder in folder_name if id_ in folder][0]
-    shutil.move(before_fold, before_fold.replace(df['before'][idx], df['after'][idx]))
+    shutil.move(before_fold, before_fold.replace(str(df['before'][idx]), str(df['after'][idx])))
 
 def change_file_name(df, idx):
     id_ = df['error_id'][idx]
@@ -37,9 +37,9 @@ need_change_file = input()
 
 shutil.copytree(data_tree, copy_tree)  # data_tree의 데이터를 copy_tree로 복사
 
-folder_name_tmp = os.listdir(folder_dir)
-folder_name = list(set([x.replace('._','') for x in folder_name_tmp]))  # '._' 제거
-folder_name.sort()
+folder_name = os.listdir(folder_dir) 
+# folder_name = list(set([x.replace('._','') for x in folder_name_tmp]))  # '._' 제거
+folder_name = sorted([x for x in folder_name if '._' not in x]) # '._' 제거
 
 file_list = [[folder_name[i]+"/"+file for file in os.listdir(os.path.join(folder_dir, folder_name[i])) if '._' not in file and 'ipynb' not in file] for i in range(len(folder_name))]
 all_file_list = list(chain(*file_list)) # 전체 파일명 (폴더별로 가져와 2차원 -> 1차원으로 풀기)
@@ -50,6 +50,7 @@ print('have to change {} file!'.format(len(df)))
 
 print("="*30)
 
+df['error_id'] = df['error_id'].apply(lambda x: str(x).zfill(6))
 for idx in range(len(df)):
     try:
         line = df.iloc[idx]
