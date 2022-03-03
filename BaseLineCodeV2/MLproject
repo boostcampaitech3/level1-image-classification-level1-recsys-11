@@ -2,20 +2,19 @@ name: first_project
 
 entry_points:
   main:
-    command: "python3 train.py \
+    command: "python3 kfoldvalidation.py \
     --experiment general \
     --dataset MaskSplitByProfileDatasetForAlbum \
     --seed 42 \
-    --epochs 5 \
-    --augmentation AugForInception \
-    --resize 224 224 \
+    --epochs 30 \
+    --augmentation BestAugForAlbum \
+    --resize 300 300 \
     --batch_size 64 \
-    --valid_batch_size 1000 \
-    --model ResNet18 \ 
+    --valid_batch_size 472 \
+    --model EfficientNetB3 \ 
     --optimizer AdamW \
-    --lr 5e-5 \
-    --criterion cross_entropy \
-    --batch_size 64 \
-    --name Rough_Training_general \
+    --lr 1e-4 \
+    --criterion label_smoothing \
+    --name SkfoldLableSmoothEfficientNetB3 \
     --mode split \
-    --user Gyeongtae"
+    --user kijung"
