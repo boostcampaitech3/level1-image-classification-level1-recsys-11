@@ -58,9 +58,18 @@ def train(data_dir, model_dir, args):
     # -- data_loader
     n_splits = 5
     # skf = StratifiedKFold(n_splits=n_splits, shuffle=True)
-    kf = KFold(n_splits=n_splits, shuffle=True)
+    # kf = KFold(n_splits=n_splits, shuffle=True)
+    kf = StratifiedKFold(n_splits=n_splits, shuffle=True)
+
+    mask_label = np.array(dataset.mask_labels)
+    gender_label = np.array(dataset.gender_labels)
+    age_label = np.array(dataset.age_labels)
+
+    y_label = mask_label*100 + gender_label*10 + age_label
+    
     print('-----------------------------------------------------------------------')
-    for fold, (train_ids, valid_ids) in enumerate(kf.split(dataset)):
+    # for fold, (train_ids, valid_ids) in enumerate(kf.split(dataset)):
+    for fold, (train_ids, valid_ids) in enumerate(kf.split(dataset, y_label)):
         print(f'--------------------------------FOLD: {fold}--------------------------------')
         train_subsampler = torch.utils.data.SubsetRandomSampler(train_ids)
         valid_subsampler = torch.utils.data.SubsetRandomSampler(valid_ids)
