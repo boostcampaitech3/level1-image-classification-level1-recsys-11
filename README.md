@@ -25,12 +25,12 @@ EDA 통해 훈련에 사용할 image와 라벨을 분석하여 데이터 불균�
 추가된 기능과 개선사항은 BaseLineCodeV2의 README.md 를 참조 하시면 됩니다:)  
 [베이스라인 코드](https://github.com/boostcampaitech3/level1-image-classification-level1-recsys-11/tree/main/BaseLineCodeV2)
 
-#🏻👥 멤버 소개 
-OOO : 역할
-OOO : 역할
-OOO : 역할
-OOO : 역할
-OOO : 역할
+# 👦🏻👩🏻 멤버 소개 
+OOO : 역할<br> 
+OOO : 역할<br> 
+OOO : 역할<br> 
+OOO : 역할<br> 
+OOO : 역할<br> 
 
 # 프로젝트 사용 툴
 ### python 3.8.5  
