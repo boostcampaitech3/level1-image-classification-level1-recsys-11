@@ -40,4 +40,4 @@ OOO : 역할<br>
 ### TensorBoard  
 <img src="https://user-images.githubusercontent.com/58928739/156548790-734b199a-01bd-4499-b0ec-c79e82ba54ef.png" width="400" height="200"><br>  
 ### mlflow
-<img src="https://user-images.githubusercontent.com/58928739/156549548-82a4e400-2b7c-41a7-8f39-41fb6fc85b1e.png" width="40%" height="40%"><br>
+<img src="https://user-images.githubusercontent.com/58928739/156549548-82a4e400-2b7c-41a7-8f39-41fb6fc85b1e.png" width="30%" height="30%"><br>
