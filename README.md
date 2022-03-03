@@ -24,3 +24,20 @@ EDA 통해 훈련에 사용할 image와 라벨을 분석하여 데이터 불균�
 대회 진행에서 주어진 기본 베이스라인 코드를 개선해가며 저희만의 베이스라인 코드로 완성시켰습니다.  
 추가된 기능과 개선사항은 BaseLineCodeV2의 README.md 를 참조 하시면 됩니다:)  
 [베이스라인 코드](https://github.com/boostcampaitech3/level1-image-classification-level1-recsys-11/tree/main/BaseLineCodeV2)
+
+#🏻👥 멤버 소개 
+OOO : 역할
+OOO : 역할
+OOO : 역할
+OOO : 역할
+OOO : 역할
+
+# 프로젝트 사용 툴
+### python 3.8.5  
+![Python-logo-notext](https://user-images.githubusercontent.com/58928739/156547814-abb34731-5ea9-4a02-8214-580f549e17c4.svg)
+### pytorch 1.10.2
+![488px-PyTorch_logo_black svg](https://user-images.githubusercontent.com/58928739/156548371-2e7044fc-273b-4f90-b8c9-6202c4af71c6.png)
+### TensorBoard  
+<img src="https://user-images.githubusercontent.com/58928739/156548790-734b199a-01bd-4499-b0ec-c79e82ba54ef.png" width="400" height="200"><br>  
+### mlflow
+<img src="https://user-images.githubusercontent.com/58928739/156549548-82a4e400-2b7c-41a7-8f39-41fb6fc85b1e.png" width="40%" height="40%"><br>
