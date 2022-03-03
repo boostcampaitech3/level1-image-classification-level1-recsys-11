@@ -19,3 +19,8 @@ EDA 통해 훈련에 사용할 image와 라벨을 분석하여 데이터 불균�
 
 # 📚 회의 노트 
 [회의 노트 노션 링크](https://recflix.notion.site/d4de596a7ca440829a08153fecc93aa4)
+
+# 🛠 BaseLineCodeV2
+대회 진행에서 주어진 기본 베이스라인 코드를 개선해가며 저희만의 베이스라인 코드로 완성시켰습니다.  
+추가된 기능과 개선사항은 BaseLineCodeV2의 README.md 를 참조 하시면 됩니다:)  
+[베이스라인 코드](https://github.com/boostcampaitech3/level1-image-classification-level1-recsys-11/tree/main/BaseLineCodeV2)
