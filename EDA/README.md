@@ -10,4 +10,5 @@
 
 결과값 → Gender(Male, Female), Age(<30, ≥30 and <60, ≥60), Mask(Wear, Incorrect, Correct)개 3개의 feature를 통해 image하나당 18개의 class(0 ~ 17)로 분류한다.
 
-![image](https://s3-ap-northeast-2.amazonaws.com/aistages-public-junyeop/app/Users/00000025/files/56bd7d05-4eb8-4e3e-884d-18bd74dc4864..png)
+![56bd7d05-4eb8-4e3e-884d-18bd74dc4864](https://user-images.githubusercontent.com/48706951/156685772-08c22924-51a8-4589-9ef6-1b7eb151869d.png)
+
