@@ -70,7 +70,7 @@ nni 실행을 위해서는 'config.yml' 파일과 'search_space.json'파일이 �
 - 'trialConcurrency'에는 몇 개의 모델을 돌릴지 넣어주시면 됩니다.
 ```
 searchSpaceFile: search_space.json
-trialCommand: python /opt/ml/level1-image-classification-level1-recsys-11/BaseLineCodeV2/train.py \
+trialCommand: python train.py \
     --experiment general \
     --dataset MaskSplitByProfileDatasetForAlbum \
     --seed 42 \
