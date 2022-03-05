@@ -19,8 +19,9 @@ from torchvision.transforms import Resize, ToTensor, Normalize, Compose, CenterC
 mean=(0.548, 0.504, 0.479)
 std=(0.237, 0.247, 0.246)
 transforms = Compose([
-            CenterCrop(360),
-            Resize(300, InterpolationMode), #, Image.BILINEAR            
+            # CenterCrop(360),
+            # # Resize(300, InterpolationMode), #, Image.BILINEAR
+            # Resize(300, Image.BILINEAR), #, Image.BILINEAR            
             ToTensor(),
             Normalize(mean=mean, std=std),
         ])
@@ -85,22 +86,27 @@ def make_prediction():
     if request.method == 'POST':
 
         # 업로드 파일 분기
+        # file = request.files['image']
         file = request.files['image']
+        print('this is file:', file)
         if not file : return render_template('index.html', label = 'No Files')
 
         # 이미지 픽셀 정보 읽기
-        img = iio.imread(file)
+        # img = iio.imread(file)
+        img = Image.open(file)
         image = transforms(img)    
 
         # prediction = model.predict(img)
+        image = image.view(1,*image.size())
         model.eval()
         pred = model(image)
         pred = pred.argmax(dim=-1)
         pred = pred.cpu().numpy()
 
-        label = class_description[pred]
+        print(type(pred[0]))
+        label = class_description[pred[0]]
 
         return render_template('index.html', label = label)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=30010, debug= True)
+    app.run(host='0.0.0.0', port=30002, debug= True)
