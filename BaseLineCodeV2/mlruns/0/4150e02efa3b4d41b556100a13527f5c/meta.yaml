@@ -1,0 +1,15 @@
+artifact_uri: file:///opt/ml/maskproject/level1-image-classification-level1-recsys-11/BaseLineCodeV2/mlruns/0/4150e02efa3b4d41b556100a13527f5c/artifacts
+end_time: 1646292040398
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+name: ''
+run_id: 4150e02efa3b4d41b556100a13527f5c
+run_uuid: 4150e02efa3b4d41b556100a13527f5c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1646271892598
+status: 3
+tags: []
+user_id: root
