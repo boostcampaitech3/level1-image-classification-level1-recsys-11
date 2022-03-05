@@ -9,6 +9,10 @@ from torch.utils.data import DataLoader
 
 from dataset import TestDataset, MaskBaseDataset
 import dataset
+import albumentations as A
+import ttach as tta
+
+
 
 
 def load_model(saved_model, num_classes, device):
@@ -24,7 +28,14 @@ def load_model(saved_model, num_classes, device):
     model_path = os.path.join(saved_model, args.state+'.pth' ) # default : best.pth
     model.load_state_dict(torch.load(model_path, map_location=device))
 
-
+    if args.tta == True : 
+        print("TTA will be applied !")
+        my_tta_transforms = tta.Compose([
+                tta.HorizontalFlip()
+            ])
+        model = tta.ClassificationTTAWrapper(model, my_tta_transforms)
+    else :
+        print("No TTA !")
     return model
 
 def load_model_select(saved_model, num_classes, device, which_model):
@@ -52,7 +63,16 @@ def inference(data_dir, model_dir, output_dir, args):
 
     num_classes = MaskBaseDataset.num_classes  # 18
     model = load_model(model_dir, num_classes, device).to(device)
-    model.eval()
+    
+    # ### TTA - Term
+    # transforms = tta.Compose(
+    #     [
+    #         tta.HorizontalFlip(),
+    #         tta.Multiply(factors=[0.9, 1, 1.1]),        
+    #     ]
+    # )
+    # model = tta.ClassificationTTAWrapper(model, transforms)
+    # model.eval()
 
     img_root = os.path.join(data_dir, 'images')
     info_path = os.path.join(data_dir, 'info.csv')
@@ -203,7 +223,9 @@ if __name__ == '__main__':
     parser.add_argument('--model', type=str, default='BaseModel', help='model type (default: BaseModel)')
     parser.add_argument('--dataset', type=str, default='TestDataset', help='TestDataset with data augmentation  (default: TestDataset)')
     parser.add_argument('--state', type=str, default='best', help='which state do you want to use. options are `best`, `last`, `best_f1` (default: best)')
-    parser.add_argument('--isEnsemble', type=str, default='False', help='Inference tpye True / False  (default: False)')
+    parser.add_argument('--isEnsemble', type=str, default='False', help='Inference type True / False  (default: False)')
+    parser.add_argument('--tta', type=bool, default='False', help='Using TTA ; True / False  (default: False)')
+
 
     # Container environment
     parser.add_argument('--data_dir', type=str, default=os.environ.get('SM_CHANNEL_EVAL', '/opt/ml/input/data/eval'))
