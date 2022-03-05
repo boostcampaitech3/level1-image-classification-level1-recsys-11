@@ -21,6 +21,7 @@
 	nav.horizontal ul li{display: inline-block;}/* horizontal menu */
 	img{max-width:100%;}
 /*-- //Reset-Code --*/
+
 ::-webkit-file-upload-button { cursor:pointer; width: 100%;}
 ::-webkit-file-upload-button:hover { opacity: 50%;}
 body {
@@ -35,6 +36,7 @@ h1,h2,h3,h4,h5,h6{
 	font-family: 'Montserrat', sans-serif;
 
 }
+
 
 .Recflix-title{
 	color: red;
@@ -55,6 +57,7 @@ h1,h2,h3,h4,h5,h6{
 .agile-its{
 	width:35%;
 	margin:50px auto;
+
 	background:black;
 
 }
@@ -76,6 +79,7 @@ h2{
 }
 
 .upload-btn-wrapper {
+
   display: flex;
   flex-direction: column;
   position: relative;
@@ -91,6 +95,7 @@ h2{
   border-radius: 8px;
   font-size: 20px;
   font-weight: bold;
+
   cursor: pointer;
 }
 
@@ -111,6 +116,7 @@ h3{
     font-weight: bold;
 }
 
+
 /* input[type="submit"]{
     width: 54%;
     background:#00BCD4;
@@ -120,6 +126,7 @@ h3{
 	font-size:14px;
 	cursor:pointer;
 	margin-left:23%;
+
 } */
 
 .submit-image-btn{

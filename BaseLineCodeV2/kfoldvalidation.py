@@ -66,14 +66,13 @@ def train(data_dir, model_dir, args):
     age_label = np.array(dataset.age_labels)
 
     y_label = mask_label*100 + gender_label*10 + age_label
-    
+
     print('-----------------------------------------------------------------------')
     # for fold, (train_ids, valid_ids) in enumerate(kf.split(dataset)):
     for fold, (train_ids, valid_ids) in enumerate(kf.split(dataset, y_label)):
         print(f'--------------------------------FOLD: {fold}--------------------------------')
         train_subsampler = torch.utils.data.SubsetRandomSampler(train_ids)
         valid_subsampler = torch.utils.data.SubsetRandomSampler(valid_ids)
-
 
         train_loader = DataLoader(
             dataset,

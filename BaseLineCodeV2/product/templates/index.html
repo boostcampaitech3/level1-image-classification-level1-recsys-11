@@ -1,6 +1,7 @@
 <html>
 
 <head>
+
     <title>Recflix Mask Gender Age Classifier</title>
     <link rel="stylesheet" href="{{ url_for('static', filename = 'style.css') }}">
     <meta charset="utf-8">
@@ -29,6 +30,7 @@
 
             <form id="upload" action="/predict" method="POST" enctype="multipart/form-data">
                 <div class="upload-btn-wrapper">
+
                     <button class="btn" id="upload-btn">이미지 업로드</button>
                     <input class="file-btn" type="file" value="Upload" name="image">
                 </div>

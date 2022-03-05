@@ -14,7 +14,7 @@ entry_points:
     --model EfficientNetB3 \ 
     --optimizer AdamW \
     --lr 1e-4 \
-    --criterion label_smoothing \
-    --name SkfoldLableSmoothEfficientNetB3 \
+    --criterion focal \
+    --name FocalEfficientNetB3_Kfold \
     --mode split \
-    --user kijung"
+    --user Gyeongtae"

@@ -215,7 +215,7 @@ class BestAugForAlbum:
             A.Resize(*resize),
             A.RandomBrightnessContrast(brightness_limit=(0, 0.1), contrast_limit=(0.1, 0.3)),
             A.GridDistortion(),
-            A.CLAHE(),
+            A.CLAHE(p=0.6),
             A.HorizontalFlip(),
             A.CoarseDropout(max_holes=5, max_height=20, max_width=40),
             A.GaussNoise(),
