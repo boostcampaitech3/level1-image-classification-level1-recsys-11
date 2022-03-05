@@ -1,0 +1,15 @@
+artifact_uri: file:///opt/ml/projects/level1-image-classification-level1-recsys-11/BaseLineCodeV2/mlruns/0/28a4739305fb4cffb71f56636c383678/artifacts
+end_time: 1646212443686
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+name: ''
+run_id: 28a4739305fb4cffb71f56636c383678
+run_uuid: 28a4739305fb4cffb71f56636c383678
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1646208002347
+status: 4
+tags: []
+user_id: root
