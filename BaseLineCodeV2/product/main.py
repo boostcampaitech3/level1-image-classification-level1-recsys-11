@@ -60,7 +60,7 @@ model = EfficientNetB3MSD(18)
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
 
-model_path = os.path.join('../model/general/FocalEfficientNetB3MSD', 'best.pth' )
+model_path = os.path.join('./models/FocalEfficientNetB3MSD', 'best.pth' )
 model.load_state_dict(torch.load(model_path, map_location=device))
 
 # label checking 
