@@ -79,7 +79,7 @@ app = Flask(__name__)
 def index():
     return flask.render_template('index.html')
 
-#
+
 @app.route('/predict', methods=['POST'])
 def make_prediction():
     if request.method == 'POST':
@@ -104,6 +104,3 @@ def make_prediction():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=30010, debug= True)
-
-
-

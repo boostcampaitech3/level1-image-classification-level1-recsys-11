@@ -5,7 +5,7 @@ entry_points:
     command: "python3 kfoldvalidation.py \
     --experiment general \
     --dataset MaskSplitByProfileDatasetForAlbum \
-    --seed 11 \
+    --seed 42 \
     --epochs 30 \
     --augmentation BestAugForAlbum \
     --resize 300 300 \

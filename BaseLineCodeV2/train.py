@@ -17,6 +17,7 @@ import torch
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
+from earlystopping import EarlyStopping
 
 from dataset import MaskBaseDataset
 from loss import create_criterion
@@ -175,7 +176,8 @@ def train(data_dir, model_dir, args):
         weight_decay=5e-4
     )
     scheduler = StepLR(optimizer, args.lr_decay_step, gamma=0.5)
-
+    early_stopping = EarlyStopping(patience=5, verbose=True)  # early_stopping
+    
     # -- logging
     logger = SummaryWriter(log_dir=save_dir)
     with open(os.path.join(save_dir, 'config.json'), 'w', encoding='utf-8') as f:
@@ -189,6 +191,7 @@ def train(data_dir, model_dir, args):
         model.train()
         loss_value = 0
         matches = 0
+        
         for idx, train_batch in enumerate(train_loader):
             inputs, labels = train_batch
             inputs = inputs.to(device)
@@ -279,6 +282,7 @@ def train(data_dir, model_dir, args):
                     mlflow.pytorch.log_model(model, 'bestModel')
                     best_val_f1 = val_f1
 
+                early_stopping(val_loss, model)
 
                 torch.save(model.module.state_dict(), f"{save_dir}/last.pth")
                 print(

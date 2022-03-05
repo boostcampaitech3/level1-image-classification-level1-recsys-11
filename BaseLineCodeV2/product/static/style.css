@@ -21,8 +21,12 @@
 	nav.horizontal ul li{display: inline-block;}/* horizontal menu */
 	img{max-width:100%;}
 /*-- //Reset-Code --*/
+
+::-webkit-file-upload-button { cursor:pointer; width: 100%;}
+::-webkit-file-upload-button:hover { opacity: 50%;}
 body {
-	background:#00BCD4;
+	/* background:#00BCD4; */
+	background: #000;
 	background-size: cover;
 	font-family: 'Open Sans', sans-serif;
 	background-attachment: fixed;
@@ -32,16 +36,29 @@ h1,h2,h3,h4,h5,h6{
 	font-family: 'Montserrat', sans-serif;
 
 }
-h1{
+
+
+.Recflix-title{
+	color: red;
+	font-size: 50px;
+}
+
+.header-div{
+	/* height: 200px; */
+	background-color: black;
+	text-align: center;
+}
+.main-title{
 	color:#fff;
-	font-size:45px;
-	text-align:center;
+	font-size:50px;
 	margin-top:50px;
+	text-align: center;
 }
 .agile-its{
 	width:35%;
 	margin:50px auto;
-	background:#fff;
+
+	background:black;
 
 }
 h2{
@@ -62,21 +79,24 @@ h2{
 }
 
 .upload-btn-wrapper {
+
+  display: flex;
+  flex-direction: column;
   position: relative;
   overflow: hidden;
-  display: inline-block;
   bottom: 20px;
-  left: 130px;
 }
 
 .btn {
-  border: 2px solid gray;
-  color: gray;
+  /* border: 2px solid gray; */
+  color: black;
   background-color: white;
   padding: 8px 20px;
   border-radius: 8px;
   font-size: 20px;
   font-weight: bold;
+
+  cursor: pointer;
 }
 
 .upload-btn-wrapper input[type=file] {
@@ -96,7 +116,8 @@ h3{
     font-weight: bold;
 }
 
-input[type="submit"]{
+
+/* input[type="submit"]{
     width: 54%;
     background:#00BCD4;
     border: none;
@@ -105,4 +126,48 @@ input[type="submit"]{
 	font-size:14px;
 	cursor:pointer;
 	margin-left:23%;
+
+} */
+
+.submit-image-btn{
+	width: 54%;
+	border-radius: 8px;
+    background:white;
+    border: none;
+    padding: 10px 0;
+    color: black;
+	font-size:20px;
+	margin-left:23%;
+	cursor: pointer;
+}
+
+.submit-image-btn:hover{
+	/* background: tomato; */
+	background-color: #b9090b;
+	/* opacity: 50%; */
+	transition-duration: 0.3s;
+}
+
+.file-btn{
+	width: 100%;
+}
+
+.contributor-wrap{
+	margin-top: 10px;
+	display: flex;
+	flex-direction: column;
+
+}
+
+.contributor-title{
+	color: white;
+	font-size: 30px;
+}
+.contributor-name{
+	margin-top: 5px;
+	color: wheat;
+}
+
+#upload-btn:hover{
+	opacity: 50%;
 }

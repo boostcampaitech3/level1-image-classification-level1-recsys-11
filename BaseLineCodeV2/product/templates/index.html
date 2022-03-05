@@ -1,25 +1,40 @@
 <html>
 
 <head>
-    <title>SVHN Model as a Flask API</title>
+
+    <title>Recflix Mask Gender Age Classifier</title>
     <link rel="stylesheet" href="{{ url_for('static', filename = 'style.css') }}">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css" integrity="sha512-NmLkDIU1C/C88wi324HBc+S2kLhi08PN5GDeUVVVC/BVt/9Izdsc9SVeVfA1UZbY3sHUlDSyRXhCzHfr6hmPPw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body>
-<h1>Flask And Google House Number Predictor</h1>
+<div class="header-div">
+    <img src="../static/recflix_logo.png" alt="Recflix Logo">
+    <div class="main-title">마스크 착용 상태 분류</div>
+    <div class="contributor-wrap">
+        <span class="contributor-title">Contributor</span>
+        <span class="contributor-name">T3178 임경태</span>
+        <span class="contributor-name">T3084 박기정</span>
+        <span class="contributor-name">T3030 김백준</span>
+        <span class="contributor-name">T3122 심유정</span>
+        <span class="contributor-name">T3193 전인혁</span>
+
+    </div>
+</div>
 <div class="agile-its">
-    <h2>Flask with ML Web Service</h2>
+    <!-- <div class="">이 사람은 마스크를 잘 썼을까요??</div> -->
     <div class="w3layouts">
         <div class="photos-upload-view">
 
             <form id="upload" action="/predict" method="POST" enctype="multipart/form-data">
                 <div class="upload-btn-wrapper">
-                    <button class="btn">이미지 업로드</button>
-                    <input type="file" value="Upload" name="image">
+
+                    <button class="btn" id="upload-btn">이미지 업로드</button>
+                    <input class="file-btn" type="file" value="Upload" name="image">
                 </div>
-                <input type="submit" value="예측 결과">
+                <input class="submit-image-btn" type="submit" value="예측 결과">
                 {% if label %}
                     <span class="result_lable">
                         {{ label }}
