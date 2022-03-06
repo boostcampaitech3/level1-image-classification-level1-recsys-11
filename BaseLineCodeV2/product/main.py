@@ -103,10 +103,15 @@ def make_prediction():
         pred = pred.argmax(dim=-1)
         pred = pred.cpu().numpy()
 
-        print(type(pred[0]))
         label = class_description[pred[0]]
 
-        return render_template('index.html', label = label)
+
+        result = label.split(' & ')
+        mask_status = result[0]
+        gender = result[1]
+        age = result[2]
+
+        return render_template('index.html', label = label, mask_status = mask_status, gender = gender, age = age)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=30002, debug= True)

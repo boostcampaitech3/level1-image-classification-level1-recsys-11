@@ -111,9 +111,33 @@ h3{
 	margin-top:10px;
 }
 
+.photos-upload-view{
+	text-align: center;
+}
+
+.result_lable_container{
+	margin-top: 20px;
+	display: flex;
+	flex-direction: column;
+
+}
+.result-title{
+	color: white;
+	font-size: 35px;
+	margin-bottom: 20px;
+}
+
 .result_lable{
 	color: #ff6000;
     font-weight: bold;
+}
+
+.result-cat{
+	color: white;
+}
+
+.label-element{
+	margin-bottom: 5px;
 }
 
 
@@ -137,7 +161,6 @@ h3{
     padding: 10px 0;
     color: black;
 	font-size:20px;
-	margin-left:23%;
 	cursor: pointer;
 }
 

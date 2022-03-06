@@ -35,12 +35,44 @@
                     <input class="file-btn" type="file" value="Upload" name="image">
                 </div>
                 <input class="submit-image-btn" type="submit" value="예측 결과">
-                {% if label %}
-                    <span class="result_lable">
-                        {{ label }}
-                    </span>
-                {% endif %}
             </form>
+            <div class="result_lable_container">
+                {% if label %}
+                    <div class="result-title">
+                        예측결과
+                    </div>
+                    <div class="label-element">
+                        <span class="result-cat">
+                            마스크 착용여부
+                        </span>
+                        <span class="result_lable">
+                            {{mask_status}}
+                        </span>
+                    </div>
+                    <div class="label-element">
+                        <span class="result-cat">
+                            추정 성별 
+                        </span>
+                        <span class="result_lable">
+                            {{gender}}
+                        </span>
+                    </div>
+                    <div class="label-element">
+                        <span class="result-cat">
+                            추정 나이
+                        </span>
+                        <span class="result_lable">
+                            {{age}}
+                        </span>
+                    </div>
+                    <!-- <span class="result_lable">
+                        추정 나이 {{gender}}
+                    </span>
+                    <span class="result_lable">
+                        추정 나이 {{age}}
+                    </span> -->
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
