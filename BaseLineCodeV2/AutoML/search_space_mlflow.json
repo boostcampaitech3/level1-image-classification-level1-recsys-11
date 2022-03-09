@@ -1,0 +1,7 @@
+{
+    "batch_size": {"_type":"choice", "_value": [32, 64, 128]},
+    "optimizer": {"_type":"choice", "_value": ["Adam", "AdamW"]},
+    "criterion": {"_type":"choice", "_value": ["cross_entropy", "focal", "label_smoothing"]},
+    "augmentation": {"_type":"choice", "_value": ["myAlbumentationAug", "AugForInception"]},   
+    "lr":{"_type":"choice","_value":[0.00001, 0.0001]}
+}

@@ -46,6 +46,76 @@
 
 ## 🔎 업데이트 노트
 
+### v.2.2.0
+NNI(AutoML) 활용을 통한 하이퍼파라미터 튜닝이 가능합니다.
+
+NNI 설치
+```
+git clone -b v2.6 https://github.com/Microsoft/nni.git
+pip install nni
+```
+
+**NNI 사용법**
+nni 실행을 위해서는 'config.yml' 파일과 'search_space.json'파일이 필요합니다.
+
+1. config.yml
+- MLflow 사용 시 활용하는 MLProject 파일과 비슷하다고 생각하시면 됩니다.
+- `searchSpaceFile:`에는 탐색할 하이퍼파라미터가 있는 파일을 지정합니다.   
+ 'search_space.json' 파일을 넣어주시면 됩니다.
+- `trialCommand:`에는 mlflow의 entry_points와 같이 입력하시면 됩니다!   
+저는 절대 경로로 넣었습니다.
+- 'trialConcurrency'에는 몇 개의 모델을 돌릴지 넣어주시면 됩니다.
+```
+searchSpaceFile: search_space.json
+trialCommand: python train.py \
+    --experiment general \
+    --dataset MaskSplitByProfileDatasetForAlbum \
+    --seed 42 \
+    --epochs 10 \
+    --resize 300 300 \
+    --model EfficientNetB3 \
+    --valid_batch_size 472 \
+    --name nni_model_experiment \
+    --user your_name
+
+trialGpuNumber: 1
+trialConcurrency: 2
+
+tuner:
+  name: TPE
+  classArgs:
+    optimize_mode: maximize
+trainingService:
+  platform: local
+  useActiveGpu: true
+```
+2. search_space.json
+- 탐색을 원하는 하이퍼파라미터와 범위를 지정해주시면 됩니다.
+```
+{
+    "batch_size": {"_type":"choice", "_value": [16, 32, 64, 128]},
+    "optimizer": {"_type":"choice", "_value": ["Adam", "SGD", "AdamW"]},
+    "augmentation": {"_type":"choice", "_value": ["myAlbumentationAug", "AugForInception"]},   
+    "lr":{"_type":"choice","_value":[0.00001, 0.0001, 0.001]}
+}
+```
+
+**nni를 이용한 실험 시작**  
+BaseLineCodeV2 디렉토리에서 다음의 명령어로 학습 수행
+```bash
+nnictl create --config AutoML/config_mask.yml --port 8080
+```
+나오는 링크 "http://127.0.0.1:8080/" 를 클릭하시면 학습 트래킹이 가능합니다.
+
+정지하실 때는 아래의 명령어를 사용해주세요.
+```bash
+nnictl stop --all
+```
+### v.2.1.5
+- **train.py**
+    - earlystopping 기능 추가
+    - earlystopping.py에서 모듈 불러와 작동하는 방식입니다. validation loss가 5에폭 이상 같을 경우 멈추도록 설정하였습니다.
+
 ### v.2.1.4
 - **train.py**
     - (03.02) Class간 예측 정확도(Accuracy)를 확인하고, 이를 통해서 Weight를 부여하기 위한 작업을 하기 위해, train 중, Validation에서 Class간 정확도를 가시적으로 확인할 수 있는 로그를 만들었습니다.
