@@ -25,6 +25,9 @@ from loss import create_criterion
 import mlflow
 import mlflow.pytorch
 
+import nni
+from nni.utils import merge_parameter
+
 def seed_everything(seed):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
@@ -326,10 +329,15 @@ def train(data_dir, model_dir, args):
                 mlflow.log_metric("best Val/accuracy", best_val_acc, epoch)
                 mlflow.log_metric("best Val/f1-macro", best_val_f1, epoch)
 
+                nni.report_intermediate_result(val_acc)
+                
                 print()
         else : 
+            nni.report_final_result(val_acc)    
             torch.save(model.module.state_dict(), f"{save_dir}/last.pth")
-            print()
+            print()        
+        
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
@@ -362,6 +370,8 @@ if __name__ == '__main__':
 
 
     args = parser.parse_args()
+    tuner_params = nni.get_next_parameter()
+    args = merge_parameter(args, tuner_params)
     print(args)
 
     data_dir = args.data_dir
@@ -371,7 +381,7 @@ if __name__ == '__main__':
     experiment_name_dict = {
         'general'  : "GENERAL", #default
         'mask'     : "Mask_model_experiment", # Mask Task 
-        'genderAge': "enderAge_model_experiment" # genderAge Task
+        'genderAge': "GenderAge_model_experiment" # genderAge Task
     }
     experiment_name = experiment_name_dict[args.experiment]
     mlflow.set_experiment(experiment_name)
@@ -385,3 +395,4 @@ if __name__ == '__main__':
         mlflow.set_tag('mlflow.user', args.user)
         mlflow.log_params(args.__dict__)
         train(data_dir, model_dir, args)
+

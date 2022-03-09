@@ -1,0 +1,22 @@
+searchSpaceFile: search_space.json
+trialCommand: python /opt/ml/level1-image-classification-level1-recsys-11/BaseLineCodeV2/train.py \
+    --experiment general \
+    --dataset MaskSplitByProfileDatasetForAlbum \
+    --seed 42 \
+    --epochs 10 \
+    --resize 300 300 \
+    --model EfficientNetB3 \
+    --valid_batch_size 472 \
+    --name nni_model_experiment \
+    --user yujeong
+
+trialGpuNumber: 1
+trialConcurrency: 2
+
+tuner:
+  name: TPE
+  classArgs:
+    optimize_mode: maximize
+trainingService:
+  platform: local
+  useActiveGpu: true

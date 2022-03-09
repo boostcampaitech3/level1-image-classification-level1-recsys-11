@@ -1,0 +1,27 @@
+searchSpaceFile: search_space_mlflow.json
+trialCommand: python /opt/ml/level1-image-classification-level1-recsys-11/BaseLineCodeV2/train.py \
+    --experiment genderAge \
+    --dataset MaskSplitByProfileDatasetForAlbumOnlyGenderAge \
+    --seed 42 \
+    --epochs 10 \
+    --resize 300 300 \
+    --model EfficientNetB3 \
+    --valid_batch_size 472 \
+    --mode split \
+    --name genderage_model_nni \
+    --user yujeong
+
+trialGpuNumber: 1
+trialConcurrency: 5
+
+tuner:
+  name: TPE
+  classArgs:
+    optimize_mode: maximize
+trainingService:
+  platform: local
+  useActiveGpu: true
+  # machineList:
+  #   - host: 49.50.164.214
+  #     user: root
+  #     ssh_key_file: /Users/yj/Documents/BoostcampAI/AIstages/key
