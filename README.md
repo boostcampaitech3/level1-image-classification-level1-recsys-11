@@ -26,11 +26,11 @@ EDA 통해 훈련에 사용할 image와 라벨을 분석하여 데이터 불균�
 [베이스라인 코드](https://github.com/boostcampaitech3/level1-image-classification-level1-recsys-11/tree/main/BaseLineCodeV2)
 
 # 👦🏻👩🏻 멤버 소개 
-OOO : 역할<br> 
-OOO : 역할<br> 
-OOO : 역할<br> 
-OOO : 역할<br> 
-OOO : 역할<br> 
+- **김백준:** 데이터 augmentation, 데이터 불균형 문제 해결법 고민
+- **박기정:** mlflow tracking server 구축, 모델 설계 및 실험, 베이스라인 코드 개선, 프로덕트 서빙
+- **심유정:** 데이터 탐색, 실험 아이디어 공유**,** 데이터 preprocessing 전략 수집 및 실행, AutoML 적용
+- **임경태:** 팀 목표 및 방향성 설정, 협업 리드, 모델 설계・실험・튜닝, 베이스라인 코드 개선, 프로덕트 서빙
+- **전인혁:** 데이터 preprocessing 전략 수집 및 실행, 모델 설계 및 실험 
 
 # 프로젝트 사용 툴
 ### python 3.8.5  
