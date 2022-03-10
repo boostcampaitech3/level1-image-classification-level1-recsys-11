@@ -25,7 +25,7 @@ EDA 통해 훈련에 사용할 image와 라벨을 분석하여 데이터 불균�
 추가된 기능과 개선사항은 BaseLineCodeV2의 README.md 를 참조 하시면 됩니다:)  
 [베이스라인 코드](https://github.com/boostcampaitech3/level1-image-classification-level1-recsys-11/tree/main/BaseLineCodeV2)
 
-# 👦🏻👩🏻 멤버 소개 
+# 👦🏻👩🏻 멤버 역할 
 - **김백준:** 데이터 augmentation, 데이터 불균형 문제 해결법 고민
 - **박기정:** mlflow tracking server 구축, 모델 설계 및 실험, 베이스라인 코드 개선, 프로덕트 서빙
 - **심유정:** 데이터 탐색, 실험 아이디어 공유, 데이터 preprocessing 전략 수집 및 실행, AutoML 적용
